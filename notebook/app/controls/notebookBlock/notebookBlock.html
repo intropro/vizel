@@ -1,0 +1,46 @@
+<div class="notebook-block-content">
+    <i ng-show="isExecuting" class="notebook-block-executing-spinner"></i>
+
+    <div class="row notebook-block-query">
+        <div class="col-lg-12" style="font-family: Arial;">
+            <div style="position: relative;padding-left: 15px;margin-top:15px; margin-bottom: 10px;">
+                <span style="position:absolute;top:0;left:0;font-weight:bold;color:#ADADAD;">&gt;</span>
+
+                <div ui-codemirror autofocus ui-codemirror-opts="codeMirrorOpts"
+                     style="width: 100%;outline: none;color:darkblue;font-weight: 700;line-height: 1.5em;"
+                     ng-model="block.in"></div>
+                <p style="color:#ABABAB;">Press Enter to execute query. Press Shift+Enter to start a new line
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row notebook-block-variables" ng-if="block.variables.length > 0">
+        <div class="form-group col-lg-4 col-md-6 col-sm-12" ng-repeat="v in block.variables">
+            <label class="control-label" style="display: block;">{{v.label || v.name}}:
+                <input type="text" class="form-control" style="display: inline-block" ng-model="v.value"/>
+            </label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div presentation-block class="presentation-block" presentation-data="block" ng-if="block.isExecuted"></div>
+        </div>
+    </div>
+
+    <div class="notebook-buttons-block">
+        <i class="glyphicon glyphicon-cog notebook-block-settings" ng-click="showBlockOptions()"></i>
+        <i class="glyphicon glyphicon-remove notebook-block-remove" ng-click="removeBlock()"></i>
+    </div>
+
+    <div class="notebook-block-resize clearfix">
+        <div class="notebook-block-resize-btn" ng-click="decreaseSize()"
+             ng-hide="block.availableSizes.indexOf(block.size) === 0">
+            <i class="glyphicon glyphicon-chevron-left"></i>
+        </div>
+        <div class="notebook-block-resize-btn" ng-click="increaseSize()"
+             ng-hide="block.availableSizes.indexOf(block.size) === block.availableSizes.length - 1">
+            <i class="glyphicon glyphicon-chevron-right"></i>
+        </div>
+    </div>
+</div>

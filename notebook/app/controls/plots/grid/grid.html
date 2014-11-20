@@ -1,0 +1,14 @@
+<div class="plot-grid">
+    <table class="table">
+        <thead>
+        <tr>
+            <th ng-repeat="col in columns">{{col.title}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="row in model.data">
+            <td ng-repeat="col in columns">{{row[col.key]}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

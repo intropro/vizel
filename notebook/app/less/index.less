@@ -1,0 +1,83 @@
+// Core variables and mixins
+@import "components/variables";
+@import "components/mixins";
+// Utilities
+@import "components/utilities";
+//Components
+
+// Grid with no gutters
+.row.no-gutter {
+  margin-left: 0;
+  margin-right: 0;
+
+  [class*='col-']:not(:first-child),
+  [class*='col-']:not(:last-child) {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: @font-family-base;
+  min-height: 100%;
+  padding-top: 50px;
+  position: relative;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px 0;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: @headings-font-weight;
+}
+
+header {
+  padding: 8px 0 8px 10px;
+  font-weight: 600;
+
+  &:extend(.clearfix all);
+}
+
+.content-wrapper {
+  padding-bottom: 40px;
+}
+
+body .CodeMirror {
+  height: auto;
+}
+
+
+@import "../controls/notebookBlock/notebookBlock";
+@import "../controls/presentationBlock/presentationBlock";
+@import "../controls/plots/grid/grid";
+@import "../controls/plots/multiBarChart/multiBarChart";
+@import "../controls/plots/lineChart/lineChart";
+@import "../controls/plots/pieChart/pieChart";
+@import "../controls/plots/mapChart/mapChart";
+
+.usa-map-img() {
+  background-image: url('../img/USA_map-128.png');
+}
+
+.spinner-img() {
+  background-image: url('../img/preloader.gif');
+}
+
+.icon__usa-map_14{
+  height: 14px;
+  width:14px;
+  background-size: contain;
+  display: inline-block;
+  .usa-map-img();
+}
