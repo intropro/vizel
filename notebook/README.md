@@ -10,12 +10,15 @@ For example nginx, looking at:
 
 
 As the backend you can use nodejs.
+
 The default port is 9090.
+
 Start the server using command:
 
 	node notebookServer.js
 	
 Default database is MySQL.
+
 Default settings:
 
 	host     : 'localhost'
