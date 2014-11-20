@@ -1,33 +1,34 @@
-Для запуска клиента можно использовать любой сервер.
-Например nginx, натравленный на:
-    1. Эту директорию - для разработки фронтенда
-    2. Либо на директорию build/dist, если нужно просто запустить проект
+To run this web app, you can use any server.
+For example nginx, looking at:
+ 	1.This directory - to develop the frontend
+ 	2.Or at the directory build/dist - if you just need to run the project
 
 
-Демо будет тут:  http://localhost/
-
-
-В качестве бэкэнда можно использовать nodejs.
-Используется порт 9090.
-Для запуска сервера выполнить в консоли из текущей директории:
+As the backend you can use nodejs.
+The default port is 9090.
+To start the server, run the following command on the console from the current directory:
 	node notebookServer.js
-В качестве БД используется MySQL.
-Дефолтные настройки (менять в notebookServer.js):
-   host     : 'localhost',
-   user     : 'admin',
-   password : '1234'
+	
+Default database is MySQL.
+Default settings:
+   	host     : 'localhost',
+   	user     : 'admin',
+   	password : '1234'
 
 
 
-Для разработки фроннтенда:
-После выкачки выполнить в консоли:
-    npm install
-затем:
-    bower install
+Contribute
+Run it using command:
+    	npm install
+then:
+	bower install
 
-После этого нужно сбилдить проект grunt-ом. Для этого нужно выполнить в консоли:
-   "grunt build:dev" - для девелопмента
-   "grunt build:dist" - для билда production версии
-   "grunt build" - для билда обоих версий
-
-Для компиляции css выполнить в консоли "grunt less", либо "grunt less:dev", либо "grunt less:dist" (только development или только production)
+Build project using commands:
+	grunt build:dev
+   	grunt build:dist
+   	grunt build - both :dev and :dist
+   
+Compile css using commands:
+  	grunt less:dev
+  	grunt less:dist
+  	grunt less - both :dev and dist
