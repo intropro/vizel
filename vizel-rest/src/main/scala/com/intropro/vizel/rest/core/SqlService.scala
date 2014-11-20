@@ -1,12 +1,12 @@
-package com.intropro.easel.rest.core
+package com.intropro.vizel.rest.core
 
 import akka.actor.Actor
 import akka.event.Logging
-import com.intropro.easel.rest.db.DbConnector
-import com.intropro.easel.rest.msg._
+import com.intropro.vizel.rest.db.DbConnector
+import com.intropro.vizel.rest.msg._
 import java.sql.Timestamp
 
-import com.intropro.easel.rest.db.DbContext._
+import com.intropro.vizel.rest.db.DbContext._
 
 /**
  * Trait to define the Operations on TodoItems

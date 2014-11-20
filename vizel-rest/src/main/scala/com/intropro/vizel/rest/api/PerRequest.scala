@@ -1,14 +1,14 @@
-package com.intropro.easel.rest.api
+package com.intropro.vizel.rest.api
 
 import akka.actor._
-import com.intropro.easel.rest.api.PerRequest.WithProps
+import com.intropro.vizel.rest.api.PerRequest.WithProps
 import spray.http.StatusCodes._
 import spray.http.{HttpHeader, StatusCode}
 import akka.actor.SupervisorStrategy.Stop
 import scala.concurrent.duration._
 import spray.routing.RequestContext
 import akka.actor.OneForOneStrategy
-import com.intropro.easel.rest.msg._
+import com.intropro.vizel.rest.msg._
 
 import spray.httpx.Json4sSupport
 import org.json4s.DefaultFormats
@@ -37,7 +37,7 @@ trait PerRequest extends Actor with Json4sSupport{
     def receive = {
       //case Execute(sql) => complete(spray.http.StatusCodes.Created, "")
       case Execute(rs) => complete(OK,rs)
-      case com.intropro.easel.rest.msg.Success(rs) => complete(OK, rs)
+      case com.intropro.vizel.rest.msg.Success(rs) => complete(OK, rs)
       case Error(message) => complete(BadRequest, message)
       case ReceiveTimeout => complete(GatewayTimeout, "Request timeout")
     }

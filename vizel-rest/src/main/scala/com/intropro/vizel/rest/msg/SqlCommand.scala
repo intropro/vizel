@@ -1,4 +1,4 @@
-package com.intropro.easel.rest.msg
+package com.intropro.vizel.rest.msg
 
 
 /**

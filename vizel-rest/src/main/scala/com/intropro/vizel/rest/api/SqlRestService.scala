@@ -1,11 +1,11 @@
-package com.intropro.easel.rest.api
+package com.intropro.vizel.rest.api
 
 import akka.actor.{Props, Actor}
-import com.intropro.easel.rest.msg.Execute
+import com.intropro.vizel.rest.msg.Execute
 import spray.http.{StatusCode, AllOrigins, MediaTypes, MediaType}
 import spray.routing._
-import com.intropro.easel.rest.core._
-import com.intropro.easel.rest.msg._
+import com.intropro.vizel.rest.core._
+import com.intropro.vizel.rest.msg._
 import spray.httpx.Json4sSupport
 import org.json4s.DefaultFormats
 

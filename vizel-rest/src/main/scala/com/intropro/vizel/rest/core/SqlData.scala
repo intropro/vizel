@@ -1,4 +1,4 @@
-package com.intropro.easel.rest.core
+package com.intropro.vizel.rest.core
 
 /**
  * Created by andreyk on 17.11.14.

@@ -1,4 +1,4 @@
-package com.intropro.easel.rest.db
+package com.intropro.vizel.rest.db
 
 /**
  * Created by andreyk on 12.11.14.

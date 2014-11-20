@@ -1,4 +1,4 @@
-package com.intropro.easel.rest.db
+package com.intropro.vizel.rest.db
 
 
 import java.util.Date
