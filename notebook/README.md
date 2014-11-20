@@ -11,7 +11,7 @@ For example nginx, looking at:
 
 As the backend you can use nodejs.
 The default port is 9090.
-To start the server, run the following command on the console from the current directory:
+Start the server using command:
 
 	node notebookServer.js
 	
