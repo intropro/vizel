@@ -1,3 +1,7 @@
+# Notebook
+
+## How to use
+
 To run this web app, you can use any server.
 For example nginx, looking at:
  	1.This directory - to develop the frontend
@@ -17,9 +21,10 @@ Default settings:
 
 
 
-Contribute
+### Contribute
+
 Run it using command:
-    	npm install
+	npm install
 then:
 	bower install
 
