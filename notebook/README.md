@@ -30,13 +30,17 @@ Default settings:
     password : '1234'
 	     
 
-### Contribute
+### Build
 
-Run it using command:
+Prerequisites:
 
+    $ npm -g install grunt (sudo)
+    $ npm -g install bower (sudo)
     $ npm install
-then:
     $ bower install
+    Choose: 
+       3) d3#~3.4 which resolved to 3.4.13 and is required by angular-nvd3#0.1.1Prefix the choice with ! to persist it to bower.json
+       6) angular#* which resolved to 1.3.3 and is required by notebookPrefix the choice with ! to persist it to bower.json
 
 
 Build project using commands:
