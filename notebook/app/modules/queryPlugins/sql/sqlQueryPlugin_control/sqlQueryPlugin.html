@@ -1,0 +1,33 @@
+<div class="query-plugin-sql">
+    <i ng-show="isExecuting" class="query-plugin-sql_executing-spinner"></i>
+
+    <!--query-->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="query-plugin-sql_query-container">
+                <span class="query-plugin-sql_query-prefix">&gt;</span>
+                <div class="query-plugin-sql_query-input"
+                     ui-codemirror autofocus ui-codemirror-opts="codeMirrorOpts"
+                     ng-model="block.in">
+                </div>
+                <p class="query-plugin-sql_query-legend">Press Shift+Enter to execute query. Press Enter to start a new
+                    line
+                </p>
+            </div>
+        </div>
+    </div>
+    <!--variables-->
+    <div class="row query-plugin-sql_variables" ng-if="block.variables.length > 0">
+        <div class="form-group col-lg-4 col-md-6 col-sm-12" ng-repeat="v in block.variables">
+            <label class="control-label query-plugin-sql_variables__label">{{v.label || v.name}}:
+                <input type="text" class="form-control query-plugin-sql_variables__input" ng-model="v.value"/>
+            </label>
+        </div>
+    </div>
+    <!--result-->
+    <div class="row">
+        <div class="col-lg-12">
+            <div presentation-block class="presentation-block" presentation-data="block" ng-if="block.isExecuted"></div>
+        </div>
+    </div>
+</div>

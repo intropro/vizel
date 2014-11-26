@@ -41,7 +41,7 @@ app.post('/query', function(req, res, next) {
 app.post('/query', function(req, res, next){
     var connection = mysql.createConnection({
         host     : 'localhost',
-        user     : 'admin',
+        user     : 'root',
         password : '1234'
     });
 

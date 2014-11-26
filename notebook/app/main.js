@@ -1,6 +1,6 @@
 define(function(require){
     require('./ngModule');
-    require('./routes');
+    require('./config');
     require('./controllers/indexController');
     require('./controls/presentationBlock/presentationBlock');
     require('./controls/notebookBlock/notebookBlock');

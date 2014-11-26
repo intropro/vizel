@@ -1872,6 +1872,89 @@ header:after {
 header:after {
   clear: both;
 }
+.query-plugin-sql {
+  font-family: Arial;
+}
+.query-plugin-sql_query-container {
+  position: relative;
+  padding-left: 15px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+.query-plugin-sql_query-prefix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-weight: bold;
+  color: #ADADAD;
+}
+.query-plugin-sql_query-input {
+  width: 100%;
+  outline: none;
+  color: darkblue;
+  font-weight: 700;
+  line-height: 1.5em;
+}
+.query-plugin-sql_query-legend {
+  color: #ABABAB;
+}
+.query-plugin-sql_variables__label {
+  display: block;
+}
+.query-plugin-sql_variables__input {
+  display: inline-block;
+}
+.query-plugin-sql_executing-spinner {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  display: inline-block;
+  height: 12px;
+  width: 132px;
+  background-size: cover;
+  background-image: url('../img/preloader.gif');
+}
+.view-mode .query-plugin-sql_executing-spinner {
+  display: none;
+}
+.view-mode .query-plugin-sql_query-container {
+  display: none;
+}
+.query-plugin-markdown {
+  font-family: Arial;
+}
+.query-plugin-markdown_query-container {
+  position: relative;
+  padding-left: 15px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+.query-plugin-markdown_query-prefix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-weight: bold;
+  color: #ADADAD;
+}
+.query-plugin-markdown_query-input {
+  width: 100%;
+  outline: none;
+  color: darkblue;
+  font-weight: 700;
+  line-height: 1.5em;
+}
+.query-plugin-markdown_query-legend {
+  color: #ABABAB;
+}
+.query-plugin-markdown_variables__label {
+  display: block;
+}
+.query-plugin-markdown_variables__input {
+  display: inline-block;
+}
+.view-mode .query-plugin-markdown_query-container {
+  display: none;
+}
 .row.no-gutter {
   margin-left: 0;
   margin-right: 0;
@@ -1968,22 +2051,10 @@ body .CodeMirror {
   border: 1px solid transparent;
   padding: 0 10px 0px 10px;
   border-radius: 4px;
+  min-height: 70px;
 }
 .edit-mode .notebook-block-content {
   border-color: #e4e4e4;
-}
-.notebook-block-executing-spinner {
-  position: absolute;
-  top: 0;
-  left: 10px;
-  display: inline-block;
-  height: 12px;
-  width: 132px;
-  background-size: cover;
-  background-image: url('../img/preloader.gif');
-}
-.view-mode .notebook-block-executing-spinner {
-  display: none;
 }
 .view-mode .notebook-block-query {
   display: none;

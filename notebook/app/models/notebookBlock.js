@@ -51,6 +51,7 @@ define(function (require) {
         this.variables = (data.variables || []).map(function(v){
             return queryVariable.factory(v);
         });
+        this.plugin = null;
     }
 
     function factory(json){

@@ -7,55 +7,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "    <div class=\"row notebook-block-query\">\r" +
-    "\n" +
-    "        <div class=\"col-lg-12\" style=\"font-family: Arial;\">\r" +
-    "\n" +
-    "            <div style=\"position: relative;padding-left: 15px;margin-top:15px; margin-bottom: 10px;\">\r" +
-    "\n" +
-    "                <span style=\"position:absolute;top:0;left:0;font-weight:bold;color:#ADADAD;\">&gt;</span>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                <div ui-codemirror autofocus ui-codemirror-opts=\"codeMirrorOpts\"\r" +
-    "\n" +
-    "                     style=\"width: 100%;outline: none;color:darkblue;font-weight: 700;line-height: 1.5em;\"\r" +
-    "\n" +
-    "                     ng-model=\"block.in\"></div>\r" +
-    "\n" +
-    "                <p style=\"color:#ABABAB;\">Press Enter to execute query. Press Shift+Enter to start a new line\r" +
-    "\n" +
-    "                </p>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "    <div class=\"row notebook-block-variables\" ng-if=\"block.variables.length > 0\">\r" +
-    "\n" +
-    "        <div class=\"form-group col-lg-4 col-md-6 col-sm-12\" ng-repeat=\"v in block.variables\">\r" +
-    "\n" +
-    "            <label class=\"control-label\" style=\"display: block;\">{{v.label || v.name}}:\r" +
-    "\n" +
-    "                <input type=\"text\" class=\"form-control\" style=\"display: inline-block\" ng-model=\"v.value\"/>\r" +
-    "\n" +
-    "            </label>\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "    <div class=\"row\">\r" +
-    "\n" +
-    "        <div class=\"col-lg-12\">\r" +
-    "\n" +
-    "            <div presentation-block class=\"presentation-block\" presentation-data=\"block\" ng-if=\"block.isExecuted\"></div>\r" +
-    "\n" +
-    "        </div>\r" +
+    "    <div ng-include=\"block.plugin.snippetUrl\">\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -327,6 +279,134 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/modules/queryPlugins/markdown/markdownQueryPlugin_control/markdownQueryPlugin.html',
+    "<div class=\"query-plugin-markdown\">\r" +
+    "\n" +
+    "    <!--query-->\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div class=\"query-plugin-markdown_query-container\">\r" +
+    "\n" +
+    "                <span class=\"query-plugin-markdown_query-prefix\">&gt;</span>\r" +
+    "\n" +
+    "                <div class=\"query-plugin-markdown_query-input\"\r" +
+    "\n" +
+    "                     ui-codemirror autofocus ui-codemirror-opts=\"codeMirrorOpts\"\r" +
+    "\n" +
+    "                     ng-model=\"block.in\">\r" +
+    "\n" +
+    "                </div>\r" +
+    "\n" +
+    "                <p class=\"query-plugin-markdown_query-legend\">Press Shift+Enter to convert markdown to HTML. Press Enter to start a new\r" +
+    "\n" +
+    "                    line\r" +
+    "\n" +
+    "                </p>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <!--result-->\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div class=\"query-plugin-markdown_result\" ng-bind-html=\"resultHtml\"></div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('/app/modules/queryPlugins/markdown/snippet.html',
+    "<div markdown-query-plugin=\"block\"></div>"
+  );
+
+
+  $templateCache.put('/app/modules/queryPlugins/sql/snippet.html',
+    "<div sql-query-plugin=\"block\"></div>"
+  );
+
+
+  $templateCache.put('/app/modules/queryPlugins/sql/sqlQueryPlugin_control/sqlQueryPlugin.html',
+    "<div class=\"query-plugin-sql\">\r" +
+    "\n" +
+    "    <i ng-show=\"isExecuting\" class=\"query-plugin-sql_executing-spinner\"></i>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "    <!--query-->\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div class=\"query-plugin-sql_query-container\">\r" +
+    "\n" +
+    "                <span class=\"query-plugin-sql_query-prefix\">&gt;</span>\r" +
+    "\n" +
+    "                <div class=\"query-plugin-sql_query-input\"\r" +
+    "\n" +
+    "                     ui-codemirror autofocus ui-codemirror-opts=\"codeMirrorOpts\"\r" +
+    "\n" +
+    "                     ng-model=\"block.in\">\r" +
+    "\n" +
+    "                </div>\r" +
+    "\n" +
+    "                <p class=\"query-plugin-sql_query-legend\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
+    "\n" +
+    "                    line\r" +
+    "\n" +
+    "                </p>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <!--variables-->\r" +
+    "\n" +
+    "    <div class=\"row query-plugin-sql_variables\" ng-if=\"block.variables.length > 0\">\r" +
+    "\n" +
+    "        <div class=\"form-group col-lg-4 col-md-6 col-sm-12\" ng-repeat=\"v in block.variables\">\r" +
+    "\n" +
+    "            <label class=\"control-label query-plugin-sql_variables__label\">{{v.label || v.name}}:\r" +
+    "\n" +
+    "                <input type=\"text\" class=\"form-control query-plugin-sql_variables__input\" ng-model=\"v.value\"/>\r" +
+    "\n" +
+    "            </label>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <!--result-->\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div presentation-block class=\"presentation-block\" presentation-data=\"block\" ng-if=\"block.isExecuted\"></div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('/app/views/blockOptions.html',
     "<h2 class=\"text-center\">Block options</h2>\r" +
     "\n" +
@@ -342,15 +422,15 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                <div class=\"btn-group\" dropdown>\r" +
     "\n" +
-    "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.queryLanguage}}<span class=\"caret\"></span>\r" +
+    "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.plugin.queryLanguage || '[select language]'}}<span class=\"caret\"></span>\r" +
     "\n" +
     "                    </button>\r" +
     "\n" +
     "                    <ul class=\"dropdown-menu\" role=\"menu\">\r" +
     "\n" +
-    "                        <li ng-repeat=\"ql in block.allQueryLanguages\">\r" +
+    "                        <li ng-repeat=\"pl in plugins\">\r" +
     "\n" +
-    "                            <a ng-click=\"block.queryLanguage = ql\">{{ql}}</a>\r" +
+    "                            <a ng-click=\"selectPlugin(pl)\">{{pl.queryLanguage}}</a>\r" +
     "\n" +
     "                        </li>\r" +
     "\n" +

@@ -1,0 +1,23 @@
+<div class="query-plugin-markdown">
+    <!--query-->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="query-plugin-markdown_query-container">
+                <span class="query-plugin-markdown_query-prefix">&gt;</span>
+                <div class="query-plugin-markdown_query-input"
+                     ui-codemirror autofocus ui-codemirror-opts="codeMirrorOpts"
+                     ng-model="block.in">
+                </div>
+                <p class="query-plugin-markdown_query-legend">Press Shift+Enter to convert markdown to HTML. Press Enter to start a new
+                    line
+                </p>
+            </div>
+        </div>
+    </div>
+    <!--result-->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="query-plugin-markdown_result" ng-bind-html="resultHtml"></div>
+        </div>
+    </div>
+</div>

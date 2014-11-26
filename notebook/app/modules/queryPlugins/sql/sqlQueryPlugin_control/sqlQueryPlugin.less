@@ -1,0 +1,59 @@
+.query-plugin-sql {
+  font-family: Arial;
+}
+
+.query-plugin-sql_query-container {
+  position: relative;
+  padding-left: 15px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.query-plugin-sql_query-prefix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-weight: bold;
+  color: #ADADAD;
+}
+
+.query-plugin-sql_query-input {
+  width: 100%;
+  outline: none;
+  color: darkblue;
+  font-weight: 700;
+  line-height: 1.5em;
+}
+
+.query-plugin-sql_query-legend{
+  color:#ABABAB;
+}
+
+.query-plugin-sql_variables__label {
+  display: block;
+}
+
+.query-plugin-sql_variables__input {
+  display: inline-block;
+}
+
+.query-plugin-sql_executing-spinner {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  display: inline-block;
+  height:12px;
+  width:132px;
+  background-size: cover;
+  .spinner-img();
+}
+
+.view-mode {
+  .query-plugin-sql_executing-spinner {
+    display: none;
+  }
+
+  .query-plugin-sql_query-container {
+    display: none;
+  }
+}

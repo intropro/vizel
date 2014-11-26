@@ -34,6 +34,14 @@ requirejs.config({
         {
             name: 'templateCacheModule',
             location: 'app/modules/template-cache'
+        },
+        {
+            name: 'sqlQueryPluginModule',
+            location: 'app/modules/queryPlugins/sql'
+        },
+        {
+            name: 'markdownQueryPluginModule',
+            location: 'app/modules/queryPlugins/markdown'
         }
     ],
     shim: {
@@ -80,6 +88,9 @@ requirejs.config({
         },
         'ng-datamap': {
             deps: ['datamaps']
+        },
+        'markdown': {
+            exports: 'markdown'
         }
     },
     deps: ['bootstrapJs']
