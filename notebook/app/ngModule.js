@@ -6,6 +6,7 @@ define(function (require) {
     require('uiCodemirror');
     require('ng-datamap');
     require('templateCacheModule');
+    require('gridster');
     var sqlPlugin = require('sqlQueryPluginModule');
     var markdownPlugin = require('markdownQueryPluginModule');
 
@@ -19,6 +20,7 @@ define(function (require) {
             'ui.codemirror',
             'datamaps',
             'templateCache',
+            'gridster',
             sqlPlugin.moduleName,
             markdownPlugin.moduleName
         ]);

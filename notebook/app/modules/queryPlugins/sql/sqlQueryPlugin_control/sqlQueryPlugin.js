@@ -27,6 +27,7 @@ define(function (require) {
                         autofocus: true
                     };
                     $scope.updateTimeout = null;
+                    $scope.isEditorFocused = false;
 
                     $scope.$watch('block.variables', function() {
                         if (!$scope.block.isExecuted) {
@@ -100,6 +101,23 @@ define(function (require) {
 
                     $scope.executeQuery();
 
+                    setTimeout(function () {
+                        $scope.$broadcast('CodeMirror', function (cm) {
+                            cm.on('focus', function(){
+                                $scope.isEditorFocused = true;
+                                if(!$scope.$$phase){
+                                    $scope.$apply();
+                                }
+                            });
+                            cm.on('blur', function(){
+                                $scope.isEditorFocused = false;
+                                if(!$scope.$$phase){
+                                    $scope.$apply();
+                                }
+                            });
+                        });
+                    }, 0);
+
                     function updateQuery(){
                         var str = $scope.block.in;
                         $scope.block.variables.forEach(function(v){
@@ -136,7 +154,6 @@ define(function (require) {
                             $scope.block.options.value = ($scope.block.options.availableValues[1] || $scope.block.options.availableValues[0]) || null;
                         }
                     }
-
                 }
             }
         }

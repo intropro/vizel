@@ -41,6 +41,21 @@ define(function (require, exports, module) {
                         }
                     }
                 };
+
+                $scope.gridsterOpts = {
+                    margins: [10, 10],
+                    columns: 4,
+                    draggable: {
+                        enabled: true
+                    },
+                    resizable:{
+                        enabled:true
+                    },
+                    floating: true,
+                    pushing: true,
+                    swapping:true,
+                    rowHeight:80
+                };
             }
         ]);
 });

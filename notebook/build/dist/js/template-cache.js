@@ -113,11 +113,39 @@ define(function (require) { require('angular').module('templateCache').run(['$te
 
 
   $templateCache.put('/app/controls/presentationBlock/presentationBlock.html',
-    "<div class=\"row\" ng-if=\"block.error\">\r" +
+    "<div ng-if=\"block.error\" class=\"\">\r" +
     "\n" +
-    "    <div class=\"col-lg-12\">\r" +
+    "    {{block.error}}\r" +
     "\n" +
-    "        {{block.error}}\r" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div ng-if=\"block.type === types.grid\" class=\" presentation-control-container-table\" plot-grid plot-data=\"block\">\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div ng-if=\"block.type === types.multiBarChart\" class=\" presentation-control-container-chart\" plot-multi-bar-chart\r" +
+    "\n" +
+    "     plot-data=\"block\">\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div ng-if=\"block.type === types.lineChart\" class=\" presentation-control-container-chart\" plot-line-chart\r" +
+    "\n" +
+    "     plot-data=\"block\">\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"\" ng-if=\"block.type === types.pieChart\">\r" +
+    "\n" +
+    "    <div class=\" presentation-control-container-chart\" plot-pie-chart plot-data=\"block\">\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -125,19 +153,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "<div class=\"row\" ng-if=\"block.type === types.grid\">\r" +
+    "<div class=\"\" ng-if=\"block.type === types.mapChart\">\r" +
     "\n" +
-    "    <div class=\"col-lg-12 presentation-control-container-table\" plot-grid plot-data=\"block\">\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "</div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "<div class=\"row\" ng-if=\"block.type === types.multiBarChart\">\r" +
-    "\n" +
-    "    <div class=\"col-lg-12 presentation-control-container-chart\" plot-multi-bar-chart plot-data=\"block\">\r" +
+    "    <div class=\"presentation-control-container-table\" plot-map-chart plot-data=\"block\">\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -145,63 +163,31 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "<div class=\"row\" ng-if=\"block.type === types.lineChart\">\r" +
+    "<div class=\"presentation-block-buttons\">\r" +
     "\n" +
-    "    <div class=\"col-lg-12 presentation-control-container-chart\" plot-line-chart plot-data=\"block\">\r" +
+    "    <div style=\"padding-bottom: 15px;\">\r" +
     "\n" +
-    "    </div>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.grid}\"\r" +
     "\n" +
-    "</div>\r" +
+    "                ng-click=\"selectType(types.grid)\">\r" +
     "\n" +
-    "\r" +
+    "            <i class=\"glyphicon glyphicon-barcode\"></i>\r" +
     "\n" +
-    "<div class=\"row\" ng-if=\"block.type === types.pieChart\">\r" +
-    "\n" +
-    "    <div class=\"col-lg-12 presentation-control-container-chart\" plot-pie-chart plot-data=\"block\">\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "</div>\r" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "<div class=\"row\" ng-if=\"block.type === types.mapChart\">\r" +
+    "        <div class=\"btn-group dropdown-char-type\" dropdown>\r" +
     "\n" +
-    "    <div class=\"col-lg-12 presentation-control-container-table\" plot-map-chart plot-data=\"block\">\r" +
+    "            <button type=\"button\" class=\"btn btn-default\"\r" +
     "\n" +
-    "    </div>\r" +
+    "                    ng-class=\"{active: block.type !== types.grid}\"\r" +
     "\n" +
-    "</div>\r" +
+    "                    ng-click=\"selectType(prevType)\"\r" +
     "\n" +
-    "\r" +
+    "                    >\r" +
     "\n" +
-    "<div class=\"row presentation-block-buttons\">\r" +
-    "\n" +
-    "    <div class=\"col-lg-12\">\r" +
-    "\n" +
-    "        <div style=\"padding-left: 15px;padding-bottom: 15px;\">\r" +
-    "\n" +
-    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.grid}\"\r" +
-    "\n" +
-    "                    ng-click=\"selectType(types.grid)\">\r" +
-    "\n" +
-    "                <i class=\"glyphicon glyphicon-barcode\"></i>\r" +
-    "\n" +
-    "            </button>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <div class=\"btn-group dropdown-char-type\" dropdown>\r" +
-    "\n" +
-    "                <button type=\"button\" class=\"btn btn-default\"\r" +
-    "\n" +
-    "                        ng-class=\"{active: block.type !== types.grid}\"\r" +
-    "\n" +
-    "                        ng-click=\"selectType(prevType)\"\r" +
-    "\n" +
-    "                        >\r" +
-    "\n" +
-    "                    <i class=\"\" ng-class=\"{\r" +
+    "                <i class=\"\" ng-class=\"{\r" +
     "\n" +
     "                        'glyphicon glyphicon-stats': prevType === types.multiBarChart || block.type === types.multiBarChart,\r" +
     "\n" +
@@ -213,65 +199,63 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                    }\"></i>\r" +
     "\n" +
-    "                </button>\r" +
+    "            </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
+    "            <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
     "\n" +
-    "                    <span class=\"caret\"></span>\r" +
+    "                <span class=\"caret\"></span>\r" +
     "\n" +
-    "                    <span class=\"sr-only\">Split button!</span>\r" +
-    "\n" +
-    "                </button>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                <ul class=\"dropdown-menu\" role=\"menu\">\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.multiBarChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-stats\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.lineChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-picture\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.pieChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.mapChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"icon__usa-map_14\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                </ul>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <button class=\"btn btn-default\" ng-hide=\"block.type == types.grid\"\r" +
-    "\n" +
-    "                    ng-click=\"showPlotOptions(block, plotOptions)\">\r" +
-    "\n" +
-    "                <i class=\"glyphicon glyphicon-cog\"></i>\r" +
+    "                <span class=\"sr-only\">Split button!</span>\r" +
     "\n" +
     "            </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <span ng-show=\"block.updatePeriod\" style=\"padding-left: 20px; color: gray;\">Update interval: <b>{{block.updatePeriod}}</b> sec.</span>\r" +
+    "            <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "\n" +
+    "                <li ng-click=\"selectType(types.multiBarChart)\" class=\"text-center menu-item\">\r" +
+    "\n" +
+    "                    <i class=\"glyphicon glyphicon-stats\"></i>\r" +
+    "\n" +
+    "                </li>\r" +
+    "\n" +
+    "                <li ng-click=\"selectType(types.lineChart)\" class=\"text-center menu-item\">\r" +
+    "\n" +
+    "                    <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "\n" +
+    "                </li>\r" +
+    "\n" +
+    "                <li ng-click=\"selectType(types.pieChart)\" class=\"text-center menu-item\">\r" +
+    "\n" +
+    "                    <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
+    "\n" +
+    "                </li>\r" +
+    "\n" +
+    "                <li ng-click=\"selectType(types.mapChart)\" class=\"text-center menu-item\">\r" +
+    "\n" +
+    "                    <i class=\"icon__usa-map_14\"></i>\r" +
+    "\n" +
+    "                </li>\r" +
+    "\n" +
+    "            </ul>\r" +
     "\n" +
     "        </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        <button class=\"btn btn-default\" ng-hide=\"block.type == types.grid\"\r" +
+    "\n" +
+    "                ng-click=\"showPlotOptions(block, plotOptions)\">\r" +
+    "\n" +
+    "            <i class=\"glyphicon glyphicon-cog\"></i>\r" +
+    "\n" +
+    "        </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        <span ng-show=\"block.updatePeriod\" style=\"padding-left: 20px; color: gray;\">Update interval: <b>{{block.updatePeriod}}</b> sec.</span>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -284,9 +268,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <!--query-->\r" +
     "\n" +
-    "    <div class=\"row\">\r" +
+    "    <div class=\"\">\r" +
     "\n" +
-    "        <div class=\"col-lg-12\">\r" +
+    "        <div class=\"\">\r" +
     "\n" +
     "            <div class=\"query-plugin-markdown_query-container\">\r" +
     "\n" +
@@ -294,15 +278,15 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                <div class=\"query-plugin-markdown_query-input\"\r" +
     "\n" +
-    "                     ui-codemirror autofocus ui-codemirror-opts=\"codeMirrorOpts\"\r" +
+    "                     ui-codemirror ui-codemirror-opts=\"codeMirrorOpts\"\r" +
     "\n" +
     "                     ng-model=\"block.in\">\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-markdown_query-legend\">Press Shift+Enter to convert markdown to HTML. Press Enter to start a new\r" +
+    "                <p class=\"query-plugin-markdown_query-legend\" ng-show=\"isEditorFocused\">\r" +
     "\n" +
-    "                    line\r" +
+    "                    Press Shift+Enter to convert markdown to HTML. Press Enter to start a new line\r" +
     "\n" +
     "                </p>\r" +
     "\n" +
@@ -314,9 +298,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <!--result-->\r" +
     "\n" +
-    "    <div class=\"row\">\r" +
+    "    <div class=\"\">\r" +
     "\n" +
-    "        <div class=\"col-lg-12\">\r" +
+    "        <div class=\"\">\r" +
     "\n" +
     "            <div class=\"query-plugin-markdown_result\" ng-bind-html=\"resultHtml\"></div>\r" +
     "\n" +
@@ -330,6 +314,42 @@ define(function (require) { require('angular').module('templateCache').run(['$te
 
   $templateCache.put('/app/modules/queryPlugins/markdown/snippet.html',
     "<div markdown-query-plugin=\"block\"></div>"
+  );
+
+
+  $templateCache.put('/app/modules/queryPlugins/sql/blockOptions.html',
+    "<div class=\"form-group\">\r" +
+    "\n" +
+    "    <label class=\"block-options-label\">Cluster:</label>\r" +
+    "\n" +
+    "    <div class=\"btn-group\" dropdown>\r" +
+    "\n" +
+    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name}}<span class=\"caret\"></span>\r" +
+    "\n" +
+    "        </button>\r" +
+    "\n" +
+    "        <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "\n" +
+    "            <li ng-repeat=\"cl in block.allClusters\">\r" +
+    "\n" +
+    "                <a ng-click=\"block.cluster = cl\">{{cl.name}}</a>\r" +
+    "\n" +
+    "            </li>\r" +
+    "\n" +
+    "        </ul>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "<div class=\"form-group\">\r" +
+    "\n" +
+    "    <label class=\"block-options-label\">Update interval (sec):</label>\r" +
+    "\n" +
+    "    <input type=\"number\" class=\"form-control\" ng-model=\"block.updatePeriod\" style=\"display: inline-block; width: auto;\" />\r" +
+    "\n" +
+    "</div>\r" +
+    "\n"
   );
 
 
@@ -363,7 +383,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-sql_query-legend\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
+    "                <p class=\"query-plugin-sql_query-legend\" ng-show=\"isEditorFocused\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
     "\n" +
     "                    line\r" +
     "\n" +
@@ -418,7 +438,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            <div class=\"form-group\">\r" +
     "\n" +
-    "                <label>Language:</label>\r" +
+    "                <label class=\"block-options-label\">Language:</label>\r" +
     "\n" +
     "                <div class=\"btn-group\" dropdown>\r" +
     "\n" +
@@ -440,41 +460,11 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            </div>\r" +
     "\n" +
-    "            <div class=\"form-group\">\r" +
-    "\n" +
-    "                <label>Cluster:</label>\r" +
-    "\n" +
-    "                <div class=\"btn-group\" dropdown>\r" +
-    "\n" +
-    "                    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name}}<span class=\"caret\"></span>\r" +
-    "\n" +
-    "                    </button>\r" +
-    "\n" +
-    "                    <ul class=\"dropdown-menu\" role=\"menu\">\r" +
-    "\n" +
-    "                        <li ng-repeat=\"cl in block.allClusters\">\r" +
-    "\n" +
-    "                            <a ng-click=\"block.cluster = cl\">{{cl.name}}</a>\r" +
-    "\n" +
-    "                        </li>\r" +
-    "\n" +
-    "                    </ul>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
-    "            <div class=\"form-group\">\r" +
-    "\n" +
-    "                <label>Update interval (sec):</label>\r" +
-    "\n" +
-    "                <input type=\"number\" class=\"form-control\" ng-model=\"block.updatePeriod\" style=\"display: inline-block; width: auto;\" />\r" +
-    "\n" +
-    "            </div>\r" +
-    "\n" +
     "        </div>\r" +
     "\n" +
     "    </div>\r" +
+    "\n" +
+    "    <div ng-include=\"block.plugin.blockOptionsSnippetUrl\"></div>\r" +
     "\n" +
     "    <div>\r" +
     "\n" +
@@ -491,27 +481,25 @@ define(function (require) { require('angular').module('templateCache').run(['$te
 
 
   $templateCache.put('/app/views/index.html',
-    "<div class=\"container-fluid\" ng-class=\"{\r" +
+    "<div class=\"content\"  ng-class=\"{\r" +
     "\n" +
     "    'edit-mode': isEditMode,\r" +
     "\n" +
     "    'view-mode': !isEditMode\r" +
     "\n" +
-    "}\">\r" +
+    "    }\">\r" +
     "\n" +
-    "    <div class=\"row\">\r" +
+    "    <div class=\"view-edit-buttons-container\" style=\"padding-top: 10px;\">\r" +
     "\n" +
-    "        <div class=\"col-lg-12\" style=\"padding-top: 10px;\">\r" +
+    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"isEditMode = false;\">View</button>\r" +
     "\n" +
-    "            <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"isEditMode = false;\">View</button>\r" +
-    "\n" +
-    "            <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"isEditMode = true;\">Edit</button>\r" +
-    "\n" +
-    "        </div>\r" +
+    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"isEditMode = true;\">Edit</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
-    "    <div class=\"row\">\r" +
+    "\r" +
+    "\n" +
+    "    <div class=\"block-list\">\r" +
     "\n" +
     "        <div notebook-block class=\"notebook-block\"\r" +
     "\n" +
@@ -535,9 +523,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    </div>\r" +
     "\n" +
-    "    <div style=\"margin: 10px 0;\" class=\"text-center notebook-block_buttons\">\r" +
+    "    <div class=\"text-center notebook-block_buttons\">\r" +
     "\n" +
-    "        <button class=\"btn btn-default\" ng-click=\"addBlock()\">Create new block</button>\r" +
+    "        <button class=\"btn btn-primary\" ng-click=\"addBlock()\">Create new block</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +

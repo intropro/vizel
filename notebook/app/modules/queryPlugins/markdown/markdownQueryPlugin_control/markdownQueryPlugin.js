@@ -23,12 +23,30 @@ define(function (require) {
                         autofocus: true
                     };
                     $scope.resultHtml = '';
+                    $scope.isEditorFocused = false;
 
-                    $scope.executeQuery = function() {
+                    $scope.executeQuery = function () {
                         $scope.resultHtml = markdown.toHTML($scope.block.in);
                     };
 
                     $scope.executeQuery();
+
+                    setTimeout(function () {
+                        $scope.$broadcast('CodeMirror', function (cm) {
+                            cm.on('focus', function(){
+                                $scope.isEditorFocused = true;
+                                if(!$scope.$$phase){
+                                    $scope.$apply();
+                                }
+                            });
+                            cm.on('blur', function(){
+                                $scope.isEditorFocused = false;
+                                if(!$scope.$$phase){
+                                    $scope.$apply();
+                                }
+                            });
+                        });
+                    }, 0);
                 }
             }
         }

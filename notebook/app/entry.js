@@ -28,7 +28,8 @@ requirejs.config({
         '../../lib/codemirror': 'bower_components/codemirror/lib/codemirror',
         'codemirrorWrapper': 'vendor/codemirrorWrapper',
 
-        'markdown': 'vendor/markdown-browser-0.6.0-beta1/markdown'
+        'markdown': 'vendor/markdown-browser-0.6.0-beta1/markdown',
+        'gridster': 'bower_components/angular-gridster/src/angular-gridster'
     },
     packages: [
         {
@@ -91,6 +92,12 @@ requirejs.config({
         },
         'markdown': {
             exports: 'markdown'
+        },
+        'gridster': {
+            deps: ['jqueryUi', 'angular']
+        },
+        'jqueryUi': {
+            deps: ['jquery']
         }
     },
     deps: ['bootstrapJs']

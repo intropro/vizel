@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-12-10 col-md-12">
             <div class="form-group">
-                <label>Language:</label>
+                <label class="block-options-label">Language:</label>
                 <div class="btn-group" dropdown>
                     <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{block.plugin.queryLanguage || '[select language]'}}<span class="caret"></span>
                     </button>
@@ -14,24 +14,9 @@
                     </ul>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Cluster:</label>
-                <div class="btn-group" dropdown>
-                    <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{block.cluster.name}}<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li ng-repeat="cl in block.allClusters">
-                            <a ng-click="block.cluster = cl">{{cl.name}}</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Update interval (sec):</label>
-                <input type="number" class="form-control" ng-model="block.updatePeriod" style="display: inline-block; width: auto;" />
-            </div>
         </div>
     </div>
+    <div ng-include="block.plugin.blockOptionsSnippetUrl"></div>
     <div>
         <p class="clearfix">
             <button class="btn btn-default pull-right" ng-click="close()">Close</button>

@@ -3,10 +3,12 @@
 @import "components/mixins";
 // Utilities
 @import "components/utilities";
-
 //Plugins
 @import "../modules/queryPlugins/sql/index";
 @import "../modules/queryPlugins/markdown/index";
+
+@import "../../bower_components/angular-gridster/src/angular-gridster";
+
 
 // Grid with no gutters
 .row.no-gutter {
@@ -60,7 +62,6 @@ body .CodeMirror {
   height: auto;
 }
 
-
 @import "../controls/notebookBlock/notebookBlock";
 @import "../controls/presentationBlock/presentationBlock";
 @import "../controls/plots/grid/grid";
@@ -77,10 +78,25 @@ body .CodeMirror {
   background-image: url('../img/preloader.gif');
 }
 
-.icon__usa-map_14{
+.icon__usa-map_14 {
   height: 14px;
-  width:14px;
+  width: 14px;
   background-size: contain;
   display: inline-block;
   .usa-map-img();
+}
+
+.block-options-label {
+  display: block;
+  color:#8C8C8C;
+}
+
+.block-list {
+  margin-bottom: 10px;
+  .clearfix();
+}
+
+.view-edit-buttons-container {
+  margin-bottom: 10px;
+  padding: 0 15px;
 }

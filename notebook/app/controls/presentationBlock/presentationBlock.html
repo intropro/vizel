@@ -1,82 +1,74 @@
-<div class="row" ng-if="block.error">
-    <div class="col-lg-12">
-        {{block.error}}
+<div ng-if="block.error" class="">
+    {{block.error}}
+</div>
+
+<div ng-if="block.type === types.grid" class=" presentation-control-container-table" plot-grid plot-data="block">
+</div>
+
+<div ng-if="block.type === types.multiBarChart" class=" presentation-control-container-chart" plot-multi-bar-chart
+     plot-data="block">
+</div>
+
+<div ng-if="block.type === types.lineChart" class=" presentation-control-container-chart" plot-line-chart
+     plot-data="block">
+</div>
+
+<div class="" ng-if="block.type === types.pieChart">
+    <div class=" presentation-control-container-chart" plot-pie-chart plot-data="block">
     </div>
 </div>
 
-<div class="row" ng-if="block.type === types.grid">
-    <div class="col-lg-12 presentation-control-container-table" plot-grid plot-data="block">
+<div class="" ng-if="block.type === types.mapChart">
+    <div class="presentation-control-container-table" plot-map-chart plot-data="block">
     </div>
 </div>
 
-<div class="row" ng-if="block.type === types.multiBarChart">
-    <div class="col-lg-12 presentation-control-container-chart" plot-multi-bar-chart plot-data="block">
-    </div>
-</div>
+<div class="presentation-block-buttons">
+    <div style="padding-bottom: 15px;">
+        <button class="btn btn-default" ng-class="{active: block.type === types.grid}"
+                ng-click="selectType(types.grid)">
+            <i class="glyphicon glyphicon-barcode"></i>
+        </button>
 
-<div class="row" ng-if="block.type === types.lineChart">
-    <div class="col-lg-12 presentation-control-container-chart" plot-line-chart plot-data="block">
-    </div>
-</div>
-
-<div class="row" ng-if="block.type === types.pieChart">
-    <div class="col-lg-12 presentation-control-container-chart" plot-pie-chart plot-data="block">
-    </div>
-</div>
-
-<div class="row" ng-if="block.type === types.mapChart">
-    <div class="col-lg-12 presentation-control-container-table" plot-map-chart plot-data="block">
-    </div>
-</div>
-
-<div class="row presentation-block-buttons">
-    <div class="col-lg-12">
-        <div style="padding-left: 15px;padding-bottom: 15px;">
-            <button class="btn btn-default" ng-class="{active: block.type === types.grid}"
-                    ng-click="selectType(types.grid)">
-                <i class="glyphicon glyphicon-barcode"></i>
-            </button>
-
-            <div class="btn-group dropdown-char-type" dropdown>
-                <button type="button" class="btn btn-default"
-                        ng-class="{active: block.type !== types.grid}"
-                        ng-click="selectType(prevType)"
-                        >
-                    <i class="" ng-class="{
+        <div class="btn-group dropdown-char-type" dropdown>
+            <button type="button" class="btn btn-default"
+                    ng-class="{active: block.type !== types.grid}"
+                    ng-click="selectType(prevType)"
+                    >
+                <i class="" ng-class="{
                         'glyphicon glyphicon-stats': prevType === types.multiBarChart || block.type === types.multiBarChart,
                         'glyphicon glyphicon-picture': prevType === types.lineChart || block.type === types.lineChart,
                         'glyphicon glyphicon-adjust': prevType === types.pieChart || block.type === types.pieChart,
                         'icon__usa-map_14': prevType === types.mapChart || block.type === types.mapChart,
                     }"></i>
-                </button>
-
-                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>
-                    <span class="caret"></span>
-                    <span class="sr-only">Split button!</span>
-                </button>
-
-                <ul class="dropdown-menu" role="menu">
-                    <li ng-click="selectType(types.multiBarChart)" class="text-center menu-item">
-                        <i class="glyphicon glyphicon-stats"></i>
-                    </li>
-                    <li ng-click="selectType(types.lineChart)" class="text-center menu-item">
-                        <i class="glyphicon glyphicon-picture"></i>
-                    </li>
-                    <li ng-click="selectType(types.pieChart)" class="text-center menu-item">
-                        <i class="glyphicon glyphicon-adjust"></i>
-                    </li>
-                    <li ng-click="selectType(types.mapChart)" class="text-center menu-item">
-                        <i class="icon__usa-map_14"></i>
-                    </li>
-                </ul>
-            </div>
-
-            <button class="btn btn-default" ng-hide="block.type == types.grid"
-                    ng-click="showPlotOptions(block, plotOptions)">
-                <i class="glyphicon glyphicon-cog"></i>
             </button>
 
-            <span ng-show="block.updatePeriod" style="padding-left: 20px; color: gray;">Update interval: <b>{{block.updatePeriod}}</b> sec.</span>
+            <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>
+                <span class="caret"></span>
+                <span class="sr-only">Split button!</span>
+            </button>
+
+            <ul class="dropdown-menu" role="menu">
+                <li ng-click="selectType(types.multiBarChart)" class="text-center menu-item">
+                    <i class="glyphicon glyphicon-stats"></i>
+                </li>
+                <li ng-click="selectType(types.lineChart)" class="text-center menu-item">
+                    <i class="glyphicon glyphicon-picture"></i>
+                </li>
+                <li ng-click="selectType(types.pieChart)" class="text-center menu-item">
+                    <i class="glyphicon glyphicon-adjust"></i>
+                </li>
+                <li ng-click="selectType(types.mapChart)" class="text-center menu-item">
+                    <i class="icon__usa-map_14"></i>
+                </li>
+            </ul>
         </div>
+
+        <button class="btn btn-default" ng-hide="block.type == types.grid"
+                ng-click="showPlotOptions(block, plotOptions)">
+            <i class="glyphicon glyphicon-cog"></i>
+        </button>
+
+        <span ng-show="block.updatePeriod" style="padding-left: 20px; color: gray;">Update interval: <b>{{block.updatePeriod}}</b> sec.</span>
     </div>
 </div>

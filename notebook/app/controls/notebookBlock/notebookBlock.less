@@ -1,16 +1,18 @@
 .notebook-block {
   position: relative;
-  margin-top: 20px;
-
+  margin-top: 5px;
 }
 
 .edit-mode {
   .notebook-block {
-    .notebook-buttons-block {
-      display: block;
-    }
-    .notebook-block-resize {
-      display: block;
+    &:hover  {
+      .notebook-buttons-block {
+        display: block;
+      }
+
+      .notebook-block-resize {
+        display: block;
+      }
     }
   }
 }
@@ -48,6 +50,10 @@
     border: 1px solid #bbbbbb;
     border-radius: 0px 4px 4px 0px;
     margin-bottom: 2px;
+
+    &:hover {
+      color: #9b9b9b;
+    }
   }
 }
 
@@ -56,12 +62,13 @@
   border: 1px solid transparent;
   padding: 0 10px 0px 10px;
   border-radius: 4px;
-  min-height: 70px;
 }
 
 .edit-mode {
-  .notebook-block-content {
-    border-color: #e4e4e4;
+  .notebook-block:hover{
+    .notebook-block-content {
+      border-color: #d6d6d6;
+    }
   }
 }
 

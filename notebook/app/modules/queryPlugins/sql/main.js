@@ -5,7 +5,8 @@ define(function (require) {
     var plugin = {
         name: 'sqlQueryPlugin',
         queryLanguage: 'SQL',
-        snippetUrl: '/app/modules/queryPlugins/sql/snippet.html'
+        snippetUrl: '/app/modules/queryPlugins/sql/snippet.html',
+        blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html'
     };
 
     return {
