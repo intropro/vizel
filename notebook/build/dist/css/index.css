@@ -826,12 +826,12 @@ Interactive Layer
 .CodeMirror div.CodeMirror-secondarycursor {
   border-left: 1px solid silver;
 }
-.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {
+.CodeMirror.cm-fat-cursor div.CodeMirror-cursor {
   width: auto;
   border: 0;
   background: #7e7;
 }
-.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursors {
+.CodeMirror.cm-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
 
@@ -899,6 +899,7 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 .cm-header, .cm-strong {font-weight: bold;}
 .cm-em {font-style: italic;}
 .cm-link {text-decoration: underline;}
+.cm-strikethrough {text-decoration: line-through;}
 
 .cm-s-default .cm-error {color: #f00;}
 .cm-invalidchar {color: #f00;}
@@ -982,6 +983,11 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   /* Hack to make IE7 behave */
   *zoom:1;
   *display:inline;
+}
+.CodeMirror-gutter-wrapper {
+  position: absolute;
+  z-index: 4;
+  height: 100%;
 }
 .CodeMirror-gutter-elt {
   position: absolute;
@@ -1078,6 +1084,9 @@ div.CodeMirror-cursors {
     visibility: hidden;
   }
 }
+
+/* See issue #2901 */
+.cm-tab-wrap-hack:after { content: ''; }
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
@@ -1954,143 +1963,6 @@ header:after {
 }
 .view-mode .query-plugin-markdown_query-container {
   display: none;
-}
-/**
- * gridster.js - v0.2.1 - 2013-10-28 * http://gridster.net
- * Copyright (c) 2013 ducksboard; Licensed MIT
- */
-.gridster {
-  position: relative;
-  margin: auto;
-  height: 0;
-}
-.gridster-content > ul {
-  margin: 0;
-  list-style: none;
-  padding: 0;
-}
-.gridster-item {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  list-style: none;
-  z-index: 2;
-  position: absolute;
-  display: none;
-}
-.gridster-loaded {
-  -webkit-transition: height .3s;
-  -moz-transition: height .3s;
-  -o-transition: height .3s;
-  transition: height .3s;
-}
-.gridster-loaded .gridster-item {
-  display: block;
-  position: absolute;
-  -webkit-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
-  -moz-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
-  -o-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
-  transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
-}
-.gridster-mobile {
-  height: auto !important;
-}
-.gridster-mobile .gridster-item {
-  height: auto;
-  position: static;
-  float: none;
-}
-.gridster-preview-holder {
-  display: none;
-  z-index: 1;
-  position: absolute;
-  background-color: #ddd;
-  border-color: #fff;
-  opacity: 0.2;
-}
-.gridster-item.gridster-item-moving,
-.gridster-item.gridster-preview-holder {
-  -webkit-transition: none;
-  -moz-transition: none;
-  -o-transition: none;
-  transition: none;
-}
-.gridster-item.ng-leave.ng-leave-active {
-  opacity: 0;
-}
-.gridster-item.ng-enter {
-  opacity: 1;
-}
-.gridster-item-moving {
-  z-index: 3;
-}
-/* RESIZE */
-.gridster-item-resizable-handler {
-  position: absolute;
-  font-size: 1px;
-  display: block;
-}
-.handle-se {
-  cursor: se-resize;
-  right: 1px;
-  bottom: 1px;
-}
-.handle-ne {
-  cursor: ne-resize;
-  width: 12px;
-  height: 12px;
-  right: 1px;
-  top: 1px;
-}
-.handle-nw {
-  cursor: nw-resize;
-  width: 12px;
-  height: 12px;
-  left: 1px;
-  top: 1px;
-}
-.handle-sw {
-  cursor: sw-resize;
-  width: 12px;
-  height: 12px;
-  left: 1px;
-  bottom: 1px;
-}
-.handle-e {
-  cursor: e-resize;
-  width: 12px;
-  bottom: 0;
-  right: 1px;
-  top: 0;
-}
-.handle-s {
-  cursor: s-resize;
-  height: 12px;
-  right: 0;
-  bottom: 1px;
-  left: 0;
-}
-.handle-n {
-  cursor: n-resize;
-  height: 12px;
-  right: 0;
-  top: 1px;
-  left: 0;
-}
-.handle-w {
-  cursor: w-resize;
-  width: 12px;
-  left: 1px;
-  top: 0;
-  bottom: 0;
-}
-.gridster .gridster-item:hover .gridster-box {
-  border: 1.5px solid #B3B2B3;
-}
-.gridster .gridster-item:hover .handle-se {
-  border-style: solid;
-  border-width: 0 0 13px 13px;
-  border-color: transparent transparent #ccc;
 }
 .row.no-gutter {
   margin-left: 0;
