@@ -1,7 +1,8 @@
 define(function(require){
     require('./ngModule');
     require('./config');
-    require('./controllers/indexController');
+    require('./controllers/IndexController');
+    require('./controllers/NotebookListController');
     require('./controls/presentationBlock/presentationBlock');
     require('./controls/notebookBlock/notebookBlock');
     require('./controls/plots/grid/grid');

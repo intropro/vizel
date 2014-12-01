@@ -1,0 +1,6 @@
+<h3>Saved notebooks</h3>
+<ul>
+    <li ng-repeat="n in notebooks">
+        <a ng-href="#/{{n.id}}">{{n.name || "notebook № " + n.id}}</a>
+    </li>
+</ul>

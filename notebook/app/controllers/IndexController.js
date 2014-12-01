@@ -7,9 +7,10 @@ define(function (require, exports, module) {
             '$scope',
             'notebookBlockService',
             '$interval',
-//            'sqlQueryExecutorService',
-            function ($scope, notebookBlockService, $interval) {
+            '$routeParams',
+            function ($scope, notebookBlockService, $interval, $routeParams) {
                 var autoSaveInterval = $interval(function () {
+//                    notebookBlockService.saveOne($scope.notebook);
                     notebookBlockService.saveAll($scope.blocks);
                 }, 2000);
 
@@ -17,10 +18,17 @@ define(function (require, exports, module) {
                 $scope.$watch('isEditMode', function () {
                     localStorage.setItem('isViewMode', !$scope.isEditMode);
                 });
+                $scope.notebook = null;
                 $scope.blocks = [];
                 notebookBlockService.getAll().then(function (blocks) {
                     $scope.blocks = blocks;
                 });
+/*
+                notebookBlockService.getById().then(function (notebook) {
+                    $scope.notebook = notebook;
+                    $scope.blocks = notebook.blocks;
+                });
+*/
 
                 $scope.blurEditor = function () {
                     if (!$scope.$$phase) {

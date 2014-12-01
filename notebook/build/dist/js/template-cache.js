@@ -533,6 +533,21 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/views/notebooks.html',
+    "<h3>Saved notebooks</h3>\r" +
+    "\n" +
+    "<ul>\r" +
+    "\n" +
+    "    <li ng-repeat=\"n in notebooks\">\r" +
+    "\n" +
+    "        <a ng-href=\"#/{{n.id}}\">{{n.name || \"notebook № \" + n.id}}</a>\r" +
+    "\n" +
+    "    </li>\r" +
+    "\n" +
+    "</ul>"
+  );
+
+
   $templateCache.put('/app/views/plotOptions.html',
     "<h2 class=\"text-center\">Plot options</h2>\r" +
     "\n" +

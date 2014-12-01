@@ -1,6 +1,10 @@
 define(function (require) {
     require('./services/queryPluginsManager');
     require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
+        $routeProvider.when('/list', {
+            templateUrl: '/app/views/notebooks.html',
+            controller: 'NotebookListController'
+        });
         $routeProvider.when('/', {
             templateUrl: '/app/views/index.html',
             controller: 'IndexController'
