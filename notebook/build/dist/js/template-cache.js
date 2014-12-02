@@ -177,71 +177,51 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "        <div class=\"btn-group dropdown-char-type\" dropdown>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.multiBarChart}\"\r" +
     "\n" +
-    "            <button type=\"button\" class=\"btn btn-default\"\r" +
+    "                ng-click=\"selectType(types.multiBarChart)\">\r" +
     "\n" +
-    "                    ng-class=\"{active: block.type !== types.grid}\"\r" +
+    "            <i class=\"glyphicon glyphicon-stats\"></i>\r" +
     "\n" +
-    "                    ng-click=\"selectType(prevType)\"\r" +
-    "\n" +
-    "                    >\r" +
-    "\n" +
-    "                <i class=\"\" ng-class=\"{\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-stats': prevType === types.multiBarChart || block.type === types.multiBarChart,\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-picture': prevType === types.lineChart || block.type === types.lineChart,\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-adjust': prevType === types.pieChart || block.type === types.pieChart,\r" +
-    "\n" +
-    "                        'icon__usa-map_14': prevType === types.mapChart || block.type === types.mapChart,\r" +
-    "\n" +
-    "                    }\"></i>\r" +
-    "\n" +
-    "            </button>\r" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
+    "\r" +
     "\n" +
-    "                <span class=\"caret\"></span>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.lineChart}\"\r" +
     "\n" +
-    "                <span class=\"sr-only\">Split button!</span>\r" +
+    "                ng-click=\"selectType(types.lineChart)\">\r" +
     "\n" +
-    "            </button>\r" +
+    "            <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "\n" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.pieChart}\"\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.multiBarChart)\" class=\"text-center menu-item\">\r" +
+    "                ng-click=\"selectType(types.pieChart)\">\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-stats\"></i>\r" +
+    "            <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
     "\n" +
-    "                </li>\r" +
+    "        </button>\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.lineChart)\" class=\"text-center menu-item\">\r" +
+    "\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.mapChart}\"\r" +
     "\n" +
-    "                </li>\r" +
+    "                ng-click=\"selectType(types.mapChart)\">\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.pieChart)\" class=\"text-center menu-item\">\r" +
+    "            <i class=\"icon__usa-map_14\"></i>\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
+    "        </button>\r" +
     "\n" +
-    "                </li>\r" +
+    "\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.mapChart)\" class=\"text-center menu-item\">\r" +
+    "\r" +
     "\n" +
-    "                    <i class=\"icon__usa-map_14\"></i>\r" +
-    "\n" +
-    "                </li>\r" +
-    "\n" +
-    "            </ul>\r" +
-    "\n" +
-    "        </div>\r" +
+    "\r" +
     "\n" +
     "\r" +
     "\n" +
@@ -324,13 +304,13 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <div class=\"btn-group\" dropdown>\r" +
     "\n" +
-    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name}}<span class=\"caret\"></span>\r" +
+    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name || '- choose cluster -'}}<span class=\"caret\"></span>\r" +
     "\n" +
     "        </button>\r" +
     "\n" +
-    "        <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "        <ul class=\"dropdown-menu\" role=\"menu\" ng-controller=\"controller_sql_QueryPlugin\">\r" +
     "\n" +
-    "            <li ng-repeat=\"cl in block.allClusters\">\r" +
+    "            <li ng-repeat=\"cl in allClusters | filter:{language: block.plugin.queryLanguage}:true\">\r" +
     "\n" +
     "                <a ng-click=\"block.cluster = cl\">{{cl.name}}</a>\r" +
     "\n" +
@@ -480,6 +460,199 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/views/clusterList.html',
+    "<h3>\r" +
+    "\n" +
+    "    Saved clusters\r" +
+    "\n" +
+    "    <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
+    "\n" +
+    "        Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "    </button>\r" +
+    "\n" +
+    "</h3>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
+    "\n" +
+    "    <thead>\r" +
+    "\n" +
+    "        <tr>\r" +
+    "\n" +
+    "            <th>Name</th>\r" +
+    "\n" +
+    "            <th>End point</th>\r" +
+    "\n" +
+    "            <th>Path to data</th>\r" +
+    "\n" +
+    "            <th>Path to error</th>\r" +
+    "\n" +
+    "            <th>Language</th>\r" +
+    "\n" +
+    "            <th></th>\r" +
+    "\n" +
+    "        </tr>\r" +
+    "\n" +
+    "    </thead>\r" +
+    "\n" +
+    "    <tbody>\r" +
+    "\n" +
+    "    <tr ng-repeat=\"c in list\">\r" +
+    "\n" +
+    "        <td>{{c.name}}</td>\r" +
+    "\n" +
+    "        <td>{{c.endPoint}}</td>\r" +
+    "\n" +
+    "        <td>{{c.pathToData}}</td>\r" +
+    "\n" +
+    "        <td>{{c.pathToError}}</td>\r" +
+    "\n" +
+    "        <td>{{c.language}}</td>\r" +
+    "\n" +
+    "        <td>\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-click=\"editInDialog(c)\"><i class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-danger\" ng-click=\"remove(c)\"><i class=\"glyphicon glyphicon-remove\"></i></button>\r" +
+    "\n" +
+    "        </td>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "</table>"
+  );
+
+
+  $templateCache.put('/app/views/editCluster.html',
+    "<div class=\"edit-cluster_title\">\r" +
+    "\n" +
+    "    <h2>Edit cluster</h2>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"row edit-cluster_content\">\r" +
+    "\n" +
+    "    <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Name:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.name\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">End point:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.endPoint\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Path to data:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.pathToData\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Path to error:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.pathToError\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Language:</label>\r" +
+    "\n" +
+    "            <div class=\"btn-group\" dropdown>\r" +
+    "\n" +
+    "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{cluster.language || '- choose language -'}}<span class=\"caret\"></span>\r" +
+    "\n" +
+    "                </button>\r" +
+    "\n" +
+    "                <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "\n" +
+    "                    <li ng-repeat=\"p in plugins\">\r" +
+    "\n" +
+    "                        <a ng-click=\"cluster.language = p.queryLanguage\">{{p.queryLanguage}}</a>\r" +
+    "\n" +
+    "                    </li>\r" +
+    "\n" +
+    "                </ul>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"col-lg-12 edit-luster_buttons\">\r" +
+    "\n" +
+    "        <p class=\"clearfix\">\r" +
+    "\n" +
+    "            <button class=\"btn btn-default pull-right\" ng-click=\"close()\">Close</button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-primary pull-right\" ng-click=\"save()\">Save</button>\r" +
+    "\n" +
+    "        </p>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('/app/views/editNotebook.html',
+    "<div class=\"edit-notebook_title\">\r" +
+    "\n" +
+    "    <h2>Edit notebook</h2>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"row edit-notebook_content\">\r" +
+    "\n" +
+    "    <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Name:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"notebook.name\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"col-lg-12 edit-luster_buttons\">\r" +
+    "\n" +
+    "        <p class=\"clearfix\">\r" +
+    "\n" +
+    "            <button class=\"btn btn-default pull-right\" ng-click=\"close()\">Close</button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-primary pull-right\" ng-click=\"save()\">Save</button>\r" +
+    "\n" +
+    "        </p>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('/app/views/index.html',
     "<div class=\"notebook-error-message\" ng-if=\"errorMessage\">{{errorMessage}}</div>\r" +
     "\n" +
@@ -548,15 +721,49 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "</h3>\r" +
     "\n" +
-    "<ul>\r" +
+    "\r" +
     "\n" +
-    "    <li ng-repeat=\"n in notebooks | filter:n.id\">\r" +
+    "<table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
     "\n" +
-    "        <a ng-href=\"#/canvas/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a>\r" +
+    "    <colgroup>\r" +
     "\n" +
-    "    </li>\r" +
+    "        <col>\r" +
     "\n" +
-    "</ul>"
+    "        <col width=\"110\">\r" +
+    "\n" +
+    "    </colgroup>\r" +
+    "\n" +
+    "    <thead>\r" +
+    "\n" +
+    "    <tr>\r" +
+    "\n" +
+    "        <th>Name</th>\r" +
+    "\n" +
+    "        <th></th>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </thead>\r" +
+    "\n" +
+    "    <tbody>\r" +
+    "\n" +
+    "    <tr ng-repeat=\"n in notebooks\">\r" +
+    "\n" +
+    "        <td><a ng-href=\"#/notebook/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a></td>\r" +
+    "\n" +
+    "        <td>\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-click=\"editInDialog(n)\"><i class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-danger\" ng-click=\"remove(n)\"><i class=\"glyphicon glyphicon-remove\"></i></button>\r" +
+    "\n" +
+    "        </td>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "</table>"
   );
 
 

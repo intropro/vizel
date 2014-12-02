@@ -92994,18 +92994,61 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
     var pluginModule = require('./ngModule');
     var name = 'service_' + pluginModule.name;
     pluginModule.module.service(name, function ($http, $q) {
-        this.execute = function (endPoint, query) {
+        this.execute = function (block) {
             var defer = $q.defer();
-            $http.post(endPoint, {
-                query: query
-            }).success(function (data) {
-                defer.resolve(data);
-            }).error(function () {
-                defer.reject(data);
+            $http.post(block.cluster.endPoint, {
+                query: block.query
+            }).success(function (response) {
+                var result = extractData(block, response);
+                defer.resolve(result);
+            }).error(function (response) {
+                var result = extractData(block, response);
+                defer.reject(result);
             });
 
             return defer.promise;
         };
+
+        function extractData(block, response){
+            var result = {
+                data: [],
+                error: null
+            };
+            var pathToData = block.cluster.pathToData;
+            var pathToError = block.cluster.pathToError;
+            if(!pathToData){
+                result.data = response;
+            } else {
+                var regDataResult = pathToData.split('.');
+
+                var lastLevelData = response;
+                regDataResult.forEach(function(path){
+                    if(lastLevelData){
+                        lastLevelData = lastLevelData[path];
+                    } else {
+                        console.error("Server response does not correspond to cluster's description. Cannot retrieve data. Response:", response, " Block:", block);
+                    }
+                });
+                result.data = lastLevelData;
+            }
+            if(!pathToError){
+                result.error = response;
+            } else {
+
+                var regErrorResult = pathToError.split('.');
+                var lastLevelError = response;
+                regErrorResult.forEach(function(path){
+                    if(lastLevelError){
+                        lastLevelError = lastLevelError[path];
+                    } else {
+                        console.error("Server response does not correspond to cluster's description. Cannot retrieve error. Response:", response, " Block:", block);
+                    }
+                });
+                result.error = lastLevelError;
+            }
+
+            return result;
+        }
     });
 
     return {
@@ -93015,26 +93058,39 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
 ;
 define('sqlQueryPluginModule/../../../models/queryVariable',['require','angular'],function (require) {
     var ng = require('angular');
-    function QueryVariable(json) {
+    function QueryVariable(data) {
+        this.name = data.name;
+        this.label = data.label || data.name;
+        this.value = data.value;
+    }
+
+    function toJson(v){
+        return {
+            name: v.name,
+            label: v.label,
+            value: v.value
+        };
+    }
+
+    function fromJson(json){
         var data = ng.extend({
             name: "",
             label: null,
             value: ""
         }, json);
 
-        this.name = data.name;
-        this.label = data.label || data.name;
-        this.value = data.value;
+        return new QueryVariable(data);
     }
 
     function factory(json){
-        var instance = new QueryVariable(json);
+        var instance = fromJson(json);
         return instance;
     }
 
     return {
         factory: factory,
-        ctor: QueryVariable
+        toJson: toJson,
+        fromJson: fromJson
     };
 });
 ;
@@ -93116,11 +93172,11 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     $scope.request = function () {
                         clearTimeout($scope.updateTimeout);
                         $scope.updateTimeout = null;
-                        if (!$scope.block.query) {
+                        if (!$scope.block.query || !$scope.block.cluster) {
                             return;
                         }
                         $scope.isExecuting = true;
-                        service.execute($scope.block.cluster.endPoint, $scope.block.query).then(function (data) {
+                        service.execute($scope.block).then(function (data) {
                             $scope.response = data;
                             $scope.block.data = data.data || [];
                             $scope.block.error = data.error || null;
@@ -93199,8 +93255,33 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
     ]);
 });
 ;
-define('sqlQueryPluginModule/main',['require','./sqlQueryPlugin_control/sqlQueryPlugin','./ngModule'],function (require) {
+define('sqlQueryPluginModule/controller',['require','./ngModule','./service'],function (require) {
+    var plugin = require('./ngModule');
+    var name = 'controller_' + plugin.name;
+    var service = require('./service');
+    plugin.module.controller(name, [
+        '$scope',
+        'clusterService',
+        service.name,
+        function ($scope, clusterService, service) {
+            $scope.allClusters = [];
+            clusterService.getAll().then(function (clusters) {
+                $scope.allClusters = clusters;
+                if (!$scope.block.cluster) {
+                    $scope.block.cluster = $scope.allClusters[0] || null;
+                }
+            });
+        }
+    ]);
+
+    return {
+        name: name
+    };
+});
+;
+define('sqlQueryPluginModule/main',['require','./sqlQueryPlugin_control/sqlQueryPlugin','./controller','./ngModule'],function (require) {
     require('./sqlQueryPlugin_control/sqlQueryPlugin');
+    require('./controller');
     var moduleContainer = require('./ngModule');
     var plugin = {
         name: 'sqlQueryPlugin',
@@ -95099,62 +95180,142 @@ define('app/services/queryPluginsManager',['require','../ngModule'],function (re
         };
     }
 });
-define('app/config',['require','./services/queryPluginsManager','./ngModule','sqlQueryPluginModule','markdownQueryPluginModule'],function (require) {
-    require('./services/queryPluginsManager');
-    require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
-        $routeProvider.when('/canvas', {
-            templateUrl: '/app/views/notebooks.html',
-            controller: 'NotebookListController'
-        });
-        $routeProvider.when('/canvas/:id', {
-            templateUrl: '/app/views/index.html',
-            controller: 'IndexController'
-        });
-        $routeProvider.otherwise({
-            redirectTo: '/canvas'
-        });
-        var sqlPlugin = require('sqlQueryPluginModule');
-        var markdownPlugin = require('markdownQueryPluginModule');
-
-        queryPluginsManagerProvider.registerPlugin(sqlPlugin.plugin.name, sqlPlugin.plugin);
-        queryPluginsManagerProvider.registerPlugin(markdownPlugin.plugin.name, markdownPlugin.plugin);
-
-        $locationProvider
-            .html5Mode(false)
-            .hashPrefix('');
-    }]);
-});
 ;
 define('app/models/queryVariable',['require','angular'],function (require) {
     var ng = require('angular');
-    function QueryVariable(json) {
+    function QueryVariable(data) {
+        this.name = data.name;
+        this.label = data.label || data.name;
+        this.value = data.value;
+    }
+
+    function toJson(v){
+        return {
+            name: v.name,
+            label: v.label,
+            value: v.value
+        };
+    }
+
+    function fromJson(json){
         var data = ng.extend({
             name: "",
             label: null,
             value: ""
         }, json);
 
-        this.name = data.name;
-        this.label = data.label || data.name;
-        this.value = data.value;
+        return new QueryVariable(data);
     }
 
     function factory(json){
-        var instance = new QueryVariable(json);
+        var instance = fromJson(json);
         return instance;
     }
 
     return {
         factory: factory,
-        ctor: QueryVariable
+        toJson: toJson,
+        fromJson: fromJson
     };
 });
 ;
-define('app/models/notebookBlock',['require','angular','./queryVariable'],function (require) {
+define('app/models/cluster',['require','angular'],function (require) {
+    var ng = require('angular');
+    function Cluster(data) {
+        this.id = data.id;
+        this.name = data.name;
+        this.endPoint = data.endPoint;
+        this.language = data.language;
+        this.pathToData = data.pathToData;
+        this.pathToError = data.pathToError;
+    }
+
+    function toJson(c){
+        return {
+            id: c.id,
+            name: c.name,
+            endPoint: c.endPoint,
+            language: c.language,
+            pathToData: c.pathToData,
+            pathToError: c.pathToError
+        };
+    }
+
+    function fromJson(json){
+        var data = ng.extend({
+            id: 0,
+            name: 'Unnamed',
+            endPoint: '',
+            language: '',
+            pathToData: 'path.to.data',
+            pathToError: 'path.to.error'
+        }, json);
+
+        return new Cluster(data);
+    }
+
+    function factory(json){
+        var instance = fromJson(json);
+        return instance;
+    }
+
+    return {
+        factory: factory,
+        toJson: toJson,
+        fromJson: fromJson
+    };
+});
+;
+define('app/models/notebookBlock',['require','angular','./queryVariable','./cluster'],function (require) {
     var ng = require('angular');
     var queryVariable = require('./queryVariable');
+    var clusterModel = require('./cluster');
 
-    function NotebookBlock(json) {
+    function NotebookBlock(data) {
+        this.in = data.in;
+        this.query = data.query;
+        this.type = data.type;
+        this.isExecuted = data.isExecuted;
+        this.data = [];
+        this.error = null;
+        this.options = data.options;
+        this.updatePeriod = data.updatePeriod;
+
+        this.pluginName = data.pluginName;
+
+        this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+
+        this.availableSizes = data.availableSizes;
+        this.size = data.size || this.availableSizes[0];
+        this.variables = (data.variables || []).map(function(v){
+            return queryVariable.factory(v);
+        });
+        this.plugin = null;
+    }
+
+    function toJson(b){
+        return {
+            in: b.in,
+            type: b.type,
+            options: {
+                key: b.options.key,
+                value: b.options.value,
+                availableKeys: b.options.availableKeys,
+                availableValues: b.options.availableValues
+            },
+            isExecuted: b.isExecuted,
+            updatePeriod: b.updatePeriod,
+            pluginName: b.pluginName,
+            queryLanguage: b.queryLanguage,
+            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+            size: b.size,
+            variables: b.variables.map(function (v) {
+                return queryVariable.toJson(v)
+            })
+        };
+    }
+
+    function fromJson(json){
         var data = ng.extend({
             in: 'select state, income from reports.sells where state like "$state%"',
             query: '',
@@ -95169,136 +95330,47 @@ define('app/models/notebookBlock',['require','angular','./queryVariable'],functi
                 availableValues: []
             },
             updatePeriod: null,
-            allQueryLanguages: ['SQL', 'md'],
-            queryLanguage: 'SQL',
-            allClusters: [{
-                name: 'MySql DB',
-                endPoint: '//localhost:9090/query'
-            }],
             cluster: null,
             size: 12,
             availableSizes: [3,4,6,8,12],
             variables: []
 
         }, json);
-
-        this.in = data.in;
-        this.query = data.query;
-        this.type = data.type;
-        this.isExecuted = data.isExecuted;
-        this.data = [];
-        this.error = null;
-        this.options = data.options;
-        this.updatePeriod = data.updatePeriod;
-
-        this.allQueryLanguages = data.allQueryLanguages || [];
-        this.queryLanguage = data.queryLanguage || this.allQueryLanguages[0];
-
-        this.allClusters = data.allClusters;
-        this.cluster = data.cluster || this.allClusters[0];
-
-        this.availableSizes = data.availableSizes || [3,4,6,8,12];
-        this.size = data.size || this.availableSizes[0];
-        this.variables = (data.variables || []).map(function(v){
-            return queryVariable.factory(v);
-        });
-        this.plugin = null;
+        return new NotebookBlock(data);
     }
 
     function factory(json){
-        var instance = new NotebookBlock(json);
+        var instance = fromJson(json);
         return instance;
     }
 
     return {
         factory: factory,
-        ctor: NotebookBlock
+        toJson: toJson,
+        fromJson: fromJson
     };
 });
 ;
-define('app/services/notebookBlockService',['require','angular','../models/notebookBlock','../ngModule'],function (require) {
-    var ng = require('angular');
-    var notebookBlock = require('../models/notebookBlock');
-
-    require('../ngModule').service('notebookBlockService', function ($q, queryPluginsManager) {
-        var blocksLocalStorageItemName = 'savedBlocks';
-        var pluginsArr = queryPluginsManager.getAll();
-        var plugins = {};
-        pluginsArr.forEach(function(p){
-            plugins[p.name] = p;
-        });
-
-        this.getAll = function () {
-            var defer = $q.defer();
-            var blocksJson = ng.fromJson(localStorage.getItem(blocksLocalStorageItemName) || []) || [];
-            var blocks = blocksJson.map(function (b) {
-                var block = notebookBlock.factory(b);
-                block.plugin = plugins[b.pluginName] || null;
-                return block;
-            });
-
-            defer.resolve(blocks);
-
-            return defer.promise;
-        };
-
-        this.saveAll = function(blocks){
-            var defer = $q.defer();
-            try {
-                var blocksJson = blocks.map(function (b) {
-                    var json = {
-                        in: b.in,
-                        type: b.type,
-                        pluginName: b.plugin ? b.plugin.name : null,
-                        options: {
-                            key: b.options.key,
-                            value: b.options.value,
-                            availableKeys: b.options.availableKeys,
-                            availableValues: b.options.availableValues
-                        },
-                        isExecuted: b.isExecuted,
-                        updatePeriod: b.updatePeriod,
-                        queryLanguage: b.queryLanguage,
-                        cluster: b.cluster ? { name: b.cluster.name, endPoint: b.cluster.endPoint} : null,
-                        size: b.size,
-                        variables: b.variables.map(function (v) {
-                            return {
-                                name: v.name,
-                                label: v.label,
-                                value: v.value
-                            };
-                        })
-                    };
-                    return json;
-                });
-
-                var jsonStr = ng.toJson(blocksJson);
-                localStorage.setItem(blocksLocalStorageItemName, jsonStr);
-            }
-            catch(e){
-                defer.reject(e);
-            }
-            defer.resolve();
-            return defer.promise;
-        };
-    });
-});
-;
-define('app/controllers/IndexController',['require','exports','module','../services/notebookBlockService','../models/notebookBlock','../ngModule'],function (require, exports, module) {
-    require('../services/notebookBlockService');
+define('app/controllers/IndexController',['require','exports','module','../models/notebookBlock','../ngModule'],function (require, exports, module) {
     var notebookBlock = require('../models/notebookBlock');
     module.exports = require('../ngModule')
         .controller('IndexController', [
             '$scope',
-            'notebookBlockService',
             'notebookService',
             '$interval',
             '$routeParams',
-            function ($scope, notebookBlockService, notebookService, $interval, $routeParams) {
+            function ($scope, notebookService, $interval, $routeParams) {
                 var autoSaveInterval = $interval(function () {
-//                    notebookBlockService.saveOne($scope.notebook);
-                    notebookBlockService.saveAll($scope.blocks);
-                }, 2000);
+                    if($scope.notebook){
+                        notebookService.saveOne($scope.notebook);
+                    }
+                }, 1000);
+
+                $scope.$on("$destroy", function() {
+                    if (autoSaveInterval) {
+                        $interval.cancel(autoSaveInterval);
+                    }
+                });
 
                 $scope.errorMessage = null;
 
@@ -95356,215 +95428,11 @@ define('app/controllers/IndexController',['require','exports','module','../servi
 });
 
 ;
-define('app/services/notebookService',['require','angular','../models/notebookBlock','../ngModule'],function (require) {
-    var ng = require('angular');
-    var notebookBlock = require('../models/notebookBlock');
-
-    require('../ngModule').service('notebookService', function ($q, queryPluginsManager) {
-        var notebooksLocalStorageItemName = 'savedNotebooks';
-        var pluginsArr = queryPluginsManager.getAll();
-        var plugins = {};
-        pluginsArr.forEach(function (p) {
-            plugins[p.name] = p;
-        });
-
-        this.canvasList = [];
-        var canvasListByIds = [];
-
-        /**
-         * @param {number} id
-         */
-        this.getById = function (id) {
-            var defer = $q.defer();
-
-            this.getAll().then(function (list) {
-                var notebook = list.filter(function (n) {
-                    return n.id === id;
-                })[0];
-                if(notebook){
-                    defer.resolve(notebook);
-                } else {
-                    defer.reject();
-                }
-            }, function () {
-                defer.reject('Something went wrong');
-            });
-
-            return defer.promise;
-        }.bind(this);
-
-        /**
-         * @returns {Array.<object>}
-         */
-        this.getAll = function () {
-            var defer = $q.defer();
-            this._restoreAll();
-
-            var notebookList = this.canvasList.map(function (n) {
-                var notebook = {
-                    id: n.id,
-                    name: n.name
-                };
-
-                notebook.blocks = n.blocks.map(function (b) {
-                    var block = notebookBlock.factory(b);
-                    block.plugin = plugins[b.pluginName] || null;
-                });
-
-                return notebook;
-            });
-
-            defer.resolve(notebookList);
-
-            return defer.promise;
-        };
-
-        /**
-         * @param {object} notebook
-         * @param {number} notebook.id
-         * @param {string} notebook.name
-         * @param {Array.<object>} notebook.blocks
-         */
-        this.save = function (notebook) {
-            var defer = $q.defer();
-            try {
-                var blocksJson = notebook.blocks.map(function (b) {
-                    var json = {
-                        in: b.in,
-                        type: b.type,
-                        pluginName: b.plugin ? b.plugin.name : null,
-                        options: {
-                            key: b.options.key,
-                            value: b.options.value,
-                            availableKeys: b.options.availableKeys,
-                            availableValues: b.options.availableValues
-                        },
-                        isExecuted: b.isExecuted,
-                        updatePeriod: b.updatePeriod,
-                        queryLanguage: b.queryLanguage,
-                        cluster: b.cluster ? { name: b.cluster.name, endPoint: b.cluster.endPoint} : null,
-                        size: b.size,
-                        variables: b.variables.map(function (v) {
-                            return {
-                                name: v.name,
-                                label: v.label,
-                                value: v.value
-                            };
-                        })
-                    };
-                    return json;
-                });
-                var notebookJson = {
-                    id: notebook.id,
-                    name: notebook.name,
-                    blocks: blocksJson
-                };
-
-                var jsonStr = ng.toJson(notebookJson);
-                localStorage.setItem(notebooksLocalStorageItemName, jsonStr);
-            }
-            catch (e) {
-                defer.reject(e);
-            }
-            defer.resolve();
-            return defer.promise;
-        };
-
-        this.saveOne = function (canvas) {
-            var defer = $q.defer();
-            this._restoreAll();
-            if (canvas.id === 0) {
-                canvas.id = canvasListByIds.length + 1;
-                canvasListByIds[canvas.id] = canvas;
-                this.canvasList.push(canvas);
-            } else {
-                var existed = canvasListByIds[canvas.id];
-                if(existed){
-                    ng.extend(existed, canvas);
-                } else {
-                    canvasListByIds[canvas.id] = canvas;
-                    this.canvasList.push(canvas);
-                }
-            }
-            this._saveAll();
-            defer.resolve(canvas);
-            return defer.promise;
-        };
-
-        this._restoreAll = function () {
-            this.canvasList = getAllJson();
-            var arr = [];
-            this.canvasList.forEach(function (c) {
-                arr[c.id] = c
-            });
-            canvasListByIds.length = 0;
-            canvasListByIds.push.apply(canvasListByIds, arr);
-        };
-
-        this._saveAll = function () {
-            var jsonStr = toJson(this.canvasList);
-            localStorage.setItem(notebooksLocalStorageItemName, jsonStr);
-        };
-
-
-        function getAllJson() {
-            var allCanvasJson = ng.fromJson(localStorage.getItem(notebooksLocalStorageItemName) || []);
-            return allCanvasJson;
-        }
-
-        function toJson(canvasList){
-            var obj = canvasList.map(function(c){
-                return {
-                    id: c.id,
-                    name: c.name,
-                    blocks: c.blocks.map(function(b){
-                        return blockToObj(b);
-                    })
-                }
-            });
-            return ng.toJson(obj);
-        }
-
-        function blockToObj(b){
-            var json = {
-                in: b.in,
-                type: b.type,
-                pluginName: b.plugin ? b.plugin.name : null,
-                options: {
-                    key: b.options.key,
-                    value: b.options.value,
-                    availableKeys: b.options.availableKeys,
-                    availableValues: b.options.availableValues
-                },
-                isExecuted: b.isExecuted,
-                updatePeriod: b.updatePeriod,
-                queryLanguage: b.queryLanguage,
-                cluster: b.cluster ? { name: b.cluster.name, endPoint: b.cluster.endPoint} : null,
-                size: b.size,
-                variables: b.variables.map(function (v) {
-                    return {
-                        name: v.name,
-                        label: v.label,
-                        value: v.value
-                    };
-                })
-            };
-            return json;
-        }
-    });
-});
-;
-define('app/models/canvas',['require','angular','./notebookBlock'],function (require) {
+define('app/models/notebook',['require','angular','./notebookBlock'],function (require) {
     var ng = require('angular');
     var notebookBlock = require('./notebookBlock');
 
-    function Canvas(json) {
-        var data = ng.extend({
-            id: 0,
-            name: "[Brand new]",
-            blocks: []
-        }, json);
-
+    function Canvas(data) {
         this.id = data.id;
         this.name = data.name;
         this.blocks = data.blocks.map(function(b){
@@ -95572,24 +95440,157 @@ define('app/models/canvas',['require','angular','./notebookBlock'],function (req
         });
     }
 
+    function toJson(notebook){
+        return {
+            id: notebook.id,
+            name: notebook.name,
+            blocks: notebook.blocks.map(function(b){
+                return notebookBlock.toJson(b);
+            })
+        };
+    }
+
+    function fromJson(json){
+        var data = ng.extend({
+            id: 0,
+            name: "[Brand new]",
+            blocks: []
+        }, json);
+
+        return new Canvas(data);
+    }
+
     function factory(json){
-        var instance = new Canvas(json);
+        var instance = fromJson(json);
         return instance;
     }
 
     return {
         factory: factory,
-        ctor: Canvas
+        toJson: toJson,
+        fromJson: fromJson
     };
 });
 ;
-define('app/controllers/NotebookListController',['require','../services/notebookService','../models/canvas','../ngModule'],function (require) {
+define('app/services/notebookService',['require','angular','../models/notebook','../ngModule'],function (require) {
+    var ng = require('angular');
+    var notebookModel = require('../models/notebook');
+    var canvasListLocalStorageItemName = 'savedCanvasList';
+
+    require('../ngModule').service('notebookService', function ($q, queryPluginsManager) {
+        var pluginsArr = queryPluginsManager.getAll();
+        var plugins = {};
+        pluginsArr.forEach(function (p) {
+            plugins[p.name] = p;
+        });
+        var that = this;
+
+        this.notebookList = [];
+
+        this.getAll = function(){
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+            defer.resolve(this.notebookList);
+
+            return defer.promise;
+        };
+
+        this.getById = function(id){
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+
+            var item = this.notebookList.filter(function(c){
+               return c.id === id;
+            })[0];
+            if(item){
+                defer.resolve(item);
+            } else {
+                defer.reject('Not found');
+            }
+
+            return defer.promise;
+
+        };
+
+        this.saveOne = function(notebook){
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+
+            if(notebook.id !== 0){
+                var existedItem = this.notebookList.filter(function(c){
+                    return c.id === notebook.id;
+                })[0];
+                if(existedItem){
+                    ng.extend(existedItem, notebook);
+                }
+            } else {
+                var idArr = [];
+                this.notebookList.forEach(function(c){
+                    idArr[c.id] = c;
+                });
+                notebook.id = idArr.length || 1;
+                this.notebookList.unshift(notebook);
+            }
+
+            _saveAllToLocalStorage();
+
+            defer.resolve();
+
+            return defer.promise;
+        };
+
+        this.removeById = function(id){
+            var defer = $q.defer();
+            _restoreAllFromLocalStorage();
+
+            var item = this.notebookList.filter(function(c){
+                return c.id === id;
+            })[0];
+            if(item){
+                this.notebookList.splice(this.notebookList.indexOf(item), 1);
+                _saveAllToLocalStorage();
+                defer.resolve();
+            } else {
+                defer.reject('Not found');
+            }
+
+            return defer.promise;
+        };
+
+        function _restoreAllFromLocalStorage(){
+            var jsonArr = ng.fromJson(localStorage.getItem(canvasListLocalStorageItemName)) || [];
+            that.notebookList.length = 0;
+            var arr = jsonArr.map(function(c){
+                var model = notebookModel.factory(c);
+                model.blocks.forEach(function(b){
+                    b.plugin = plugins[b.pluginName] || null;
+                });
+                return model;
+            });
+            that.notebookList.push.apply(that.notebookList, arr);
+        }
+
+        function _saveAllToLocalStorage(){
+            var arr = that.notebookList.map(function(c){
+                return notebookModel.toJson(c);
+            });
+            var jsonString2Save = ng.toJson(arr);
+            localStorage.setItem(canvasListLocalStorageItemName, jsonString2Save);
+        }
+    });
+});
+;
+define('app/controllers/NotebookListController',['require','../services/notebookService','../models/notebook','../ngModule'],function (require) {
     require('../services/notebookService');
-    var canvas = require('../models/canvas');
+    var notebook = require('../models/notebook');
     require('../ngModule').controller('NotebookListController', [
         '$scope',
         'notebookService',
-        function ($scope, notebookService) {
+        '$modal',
+        function ($scope, notebookService, $modal) {
             $scope.notebooks = [];
 
             notebookService.getAll().then(function (notebooks) {
@@ -95599,15 +95600,236 @@ define('app/controllers/NotebookListController',['require','../services/notebook
             });
 
             $scope.createNew = function(){
-                var newCanvas = canvas.factory();
-                notebookService.saveOne(newCanvas).then(function(savedCanvas){
-                    $scope.notebooks.unshift(savedCanvas);
-                }, function(){
-                    alert('Error!');
+                var newCanvas = notebook.factory();
+                $scope.editInDialog(newCanvas);
+            };
+
+            $scope.remove = function(notebook){
+                var decision = confirm('Are you sure you want to remove the notebook ' + notebook.name + '?');
+                if(decision){
+                    notebookService.removeById(notebook.id);
+                }
+            };
+
+
+            $scope.editInDialog = function (notebook) {
+                $modal.open({
+                    templateUrl: '/app/views/editNotebook.html',
+                    controller: function ($scope, $modalInstance, notebook) {
+                        $scope.notebook = notebook;
+
+                        $scope.close = function () {
+                            $modalInstance.close();
+                        };
+
+                        $scope.save = function () {
+                            notebookService.saveOne(notebook).then(function(savedCanvas){
+                                $modalInstance.close();
+                            }, function(){
+                                alert('Error!');
+                            });
+
+                        };
+                    },
+                    size: '',
+                    resolve: {
+                        notebook: function () {
+                            return notebook;
+                        }
+                    }
                 });
             };
         }
     ]);
+});
+;
+define('app/services/clusterService',['require','angular','../models/cluster','../ngModule'],function (require) {
+    var ng = require('angular');
+    var clusterListLocalStorageItemName = 'savedClusterList';
+    var clusterModel = require('../models/cluster');
+
+    require('../ngModule').service('clusterService', function ($q) {
+        var that = this;
+
+        this.clusterList = [];
+
+        this.getAll = function () {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+            defer.resolve(this.clusterList);
+
+            return defer.promise;
+        };
+
+        this.getById = function (id) {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+
+            var item = this.clusterList.filter(function (c) {
+                return c.id === id;
+            })[0];
+            if (item) {
+                defer.resolve(item);
+            } else {
+                defer.reject('Not found');
+            }
+
+            return defer.promise;
+        };
+
+        this.saveOne = function (cluster) {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage();
+
+            if (cluster.id !== 0) {
+                var existedItem = this.clusterList.filter(function (c) {
+                    return c.id === cluster.id;
+                })[0];
+                if (existedItem) {
+                    ng.extend(existedItem, cluster);
+                }
+            } else {
+                var idArr = [];
+                this.clusterList.forEach(function (c) {
+                    idArr[c.id] = c;
+                });
+                cluster.id = idArr.length || 1;
+                this.clusterList.unshift(cluster);
+            }
+
+            _saveAllToLocalStorage();
+
+            defer.resolve();
+
+            return defer.promise;
+        };
+
+        this.removeById = function (id) {
+            var defer = $q.defer();
+            _restoreAllFromLocalStorage();
+
+            var item = this.clusterList.filter(function (c) {
+                return c.id === id;
+            })[0];
+            if (item) {
+                this.clusterList.splice(this.clusterList.indexOf(item), 1);
+                _saveAllToLocalStorage();
+                defer.resolve();
+            } else {
+                defer.reject('Not found');
+            }
+
+
+            return defer.promise;
+        };
+
+        function _restoreAllFromLocalStorage() {
+            var jsonArr = ng.fromJson(localStorage.getItem(clusterListLocalStorageItemName)) || [];
+            that.clusterList.length = 0;
+            that.clusterList.push.apply(that.clusterList, jsonArr);
+        }
+
+        function _saveAllToLocalStorage() {
+            var jsonString2Save = ng.toJson(that.clusterList.map(function (c) {
+                return clusterModel.toJson(c);
+            }));
+            localStorage.setItem(clusterListLocalStorageItemName, jsonString2Save);
+        }
+    });
+});
+;
+define('app/controllers/ClusterListController',['require','../services/queryPluginsManager','../services/clusterService','../models/cluster','../ngModule'],function (require) {
+    require('../services/queryPluginsManager');
+    require('../services/clusterService');
+    var clusterModel = require('../models/cluster');
+    require('../ngModule').controller('ClusterListController', function ($scope, clusterService, queryPluginsManager, $modal) {
+        $scope.list = [];
+
+        $scope.createNew = function(){
+            var newCluster = clusterModel.factory({
+                endPoint:'http://localhost:9090/query'
+            });
+            $scope.editInDialog(newCluster);
+        };
+
+        $scope.remove = function(cluster){
+            var decision = confirm('Are you sure you want to remove the cluster ' + cluster.name + '?');
+            if(decision){
+                clusterService.removeById(cluster.id);
+            }
+        };
+
+        $scope.editInDialog = function (cluster) {
+            $modal.open({
+                templateUrl: '/app/views/editCluster.html',
+                controller: function ($scope, $modalInstance, cluster, plugins) {
+                    $scope.cluster = cluster;
+                    $scope.plugins = plugins;
+
+                    $scope.close = function () {
+                        $modalInstance.close();
+                    };
+
+                    $scope.save = function () {
+                        clusterService.saveOne($scope.cluster);
+                        $modalInstance.close();
+                    };
+                },
+                size: '',
+                resolve: {
+                    plugins: function(){
+                        var plugins = queryPluginsManager.getAll();
+                        return plugins;
+                    },
+                    cluster: function () {
+                        return cluster;
+                    }
+                }
+            });
+        };
+
+        $scope.plugins = queryPluginsManager.getAll();
+
+        clusterService.getAll().then(function (clusters) {
+            $scope.list = clusters;
+        });
+    });
+});
+define('app/config',['require','./services/queryPluginsManager','./controllers/IndexController','./controllers/NotebookListController','./controllers/ClusterListController','./ngModule','sqlQueryPluginModule','markdownQueryPluginModule'],function (require) {
+    require('./services/queryPluginsManager');
+    require('./controllers/IndexController');
+    require('./controllers/NotebookListController');
+    require('./controllers/ClusterListController');
+
+    require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
+        $routeProvider.when('/notebook', {
+            templateUrl: '/app/views/notebooks.html',
+            controller: 'NotebookListController'
+        });
+        $routeProvider.when('/notebook/:id', {
+            templateUrl: '/app/views/index.html',
+            controller: 'IndexController'
+        });
+        $routeProvider.when('/clusters', {
+            templateUrl: '/app/views/clusterList.html',
+            controller: 'ClusterListController'
+        });
+        $routeProvider.otherwise({
+            redirectTo: '/notebook'
+        });
+        var sqlPlugin = require('sqlQueryPluginModule');
+        var markdownPlugin = require('markdownQueryPluginModule');
+
+        queryPluginsManagerProvider.registerPlugin(sqlPlugin.plugin.name, sqlPlugin.plugin);
+        queryPluginsManagerProvider.registerPlugin(markdownPlugin.plugin.name, markdownPlugin.plugin);
+
+        $locationProvider
+            .html5Mode(false)
+            .hashPrefix('');
+    }]);
 });
 ;
 define('app/controls/presentationBlock/presentationBlock',['require','d3','../../ngModule'],function (require) {
@@ -95694,6 +95916,9 @@ define('app/controls/notebookBlock/notebookBlock',['require','angular','../../ng
                             $scope.selectPlugin = function(plugin){
                                 block.plugin = plugin;
                             };
+                            $scope.$watch('block.plugin', function(){
+                                $scope.block.pluginName = $scope.block.plugin ? $scope.block.plugin.name : '';
+                            });
 
                             $scope.close = function () {
                                 $modalInstance.close();
@@ -96234,11 +96459,9 @@ define('app/controls/plots/mapChart/mapChart',['require','d3','jquery','../../..
         };
     });
 });
-define('app/main',['require','./ngModule','./config','./controllers/IndexController','./controllers/NotebookListController','./controls/presentationBlock/presentationBlock','./controls/notebookBlock/notebookBlock','./controls/plots/grid/grid','./controls/plots/multiBarChart/multiBarChart','./controls/plots/lineChart/lineChart','./controls/plots/pieChart/pieChart','./controls/plots/mapChart/mapChart'],function(require){
+define('app/main',['require','./ngModule','./config','./controls/presentationBlock/presentationBlock','./controls/notebookBlock/notebookBlock','./controls/plots/grid/grid','./controls/plots/multiBarChart/multiBarChart','./controls/plots/lineChart/lineChart','./controls/plots/pieChart/pieChart','./controls/plots/mapChart/mapChart'],function(require){
     require('./ngModule');
     require('./config');
-    require('./controllers/IndexController');
-    require('./controllers/NotebookListController');
     require('./controls/presentationBlock/presentationBlock');
     require('./controls/notebookBlock/notebookBlock');
     require('./controls/plots/grid/grid');
@@ -96459,71 +96682,51 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "\r" +
     "\n" +
-    "        <div class=\"btn-group dropdown-char-type\" dropdown>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.multiBarChart}\"\r" +
     "\n" +
-    "            <button type=\"button\" class=\"btn btn-default\"\r" +
+    "                ng-click=\"selectType(types.multiBarChart)\">\r" +
     "\n" +
-    "                    ng-class=\"{active: block.type !== types.grid}\"\r" +
+    "            <i class=\"glyphicon glyphicon-stats\"></i>\r" +
     "\n" +
-    "                    ng-click=\"selectType(prevType)\"\r" +
-    "\n" +
-    "                    >\r" +
-    "\n" +
-    "                <i class=\"\" ng-class=\"{\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-stats': prevType === types.multiBarChart || block.type === types.multiBarChart,\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-picture': prevType === types.lineChart || block.type === types.lineChart,\r" +
-    "\n" +
-    "                        'glyphicon glyphicon-adjust': prevType === types.pieChart || block.type === types.pieChart,\r" +
-    "\n" +
-    "                        'icon__usa-map_14': prevType === types.mapChart || block.type === types.mapChart,\r" +
-    "\n" +
-    "                    }\"></i>\r" +
-    "\n" +
-    "            </button>\r" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
+    "\r" +
     "\n" +
-    "                <span class=\"caret\"></span>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.lineChart}\"\r" +
     "\n" +
-    "                <span class=\"sr-only\">Split button!</span>\r" +
+    "                ng-click=\"selectType(types.lineChart)\">\r" +
     "\n" +
-    "            </button>\r" +
+    "            <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "\n" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.pieChart}\"\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.multiBarChart)\" class=\"text-center menu-item\">\r" +
+    "                ng-click=\"selectType(types.pieChart)\">\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-stats\"></i>\r" +
+    "            <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
     "\n" +
-    "                </li>\r" +
+    "        </button>\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.lineChart)\" class=\"text-center menu-item\">\r" +
+    "\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.mapChart}\"\r" +
     "\n" +
-    "                </li>\r" +
+    "                ng-click=\"selectType(types.mapChart)\">\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.pieChart)\" class=\"text-center menu-item\">\r" +
+    "            <i class=\"icon__usa-map_14\"></i>\r" +
     "\n" +
-    "                    <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
+    "        </button>\r" +
     "\n" +
-    "                </li>\r" +
+    "\r" +
     "\n" +
-    "                <li ng-click=\"selectType(types.mapChart)\" class=\"text-center menu-item\">\r" +
+    "\r" +
     "\n" +
-    "                    <i class=\"icon__usa-map_14\"></i>\r" +
-    "\n" +
-    "                </li>\r" +
-    "\n" +
-    "            </ul>\r" +
-    "\n" +
-    "        </div>\r" +
+    "\r" +
     "\n" +
     "\r" +
     "\n" +
@@ -96606,13 +96809,13 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "    <div class=\"btn-group\" dropdown>\r" +
     "\n" +
-    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name}}<span class=\"caret\"></span>\r" +
+    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name || '- choose cluster -'}}<span class=\"caret\"></span>\r" +
     "\n" +
     "        </button>\r" +
     "\n" +
-    "        <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "        <ul class=\"dropdown-menu\" role=\"menu\" ng-controller=\"controller_sql_QueryPlugin\">\r" +
     "\n" +
-    "            <li ng-repeat=\"cl in block.allClusters\">\r" +
+    "            <li ng-repeat=\"cl in allClusters | filter:{language: block.plugin.queryLanguage}:true\">\r" +
     "\n" +
     "                <a ng-click=\"block.cluster = cl\">{{cl.name}}</a>\r" +
     "\n" +
@@ -96762,6 +96965,199 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
   );
 
 
+  $templateCache.put('/app/views/clusterList.html',
+    "<h3>\r" +
+    "\n" +
+    "    Saved clusters\r" +
+    "\n" +
+    "    <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
+    "\n" +
+    "        Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "    </button>\r" +
+    "\n" +
+    "</h3>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
+    "\n" +
+    "    <thead>\r" +
+    "\n" +
+    "        <tr>\r" +
+    "\n" +
+    "            <th>Name</th>\r" +
+    "\n" +
+    "            <th>End point</th>\r" +
+    "\n" +
+    "            <th>Path to data</th>\r" +
+    "\n" +
+    "            <th>Path to error</th>\r" +
+    "\n" +
+    "            <th>Language</th>\r" +
+    "\n" +
+    "            <th></th>\r" +
+    "\n" +
+    "        </tr>\r" +
+    "\n" +
+    "    </thead>\r" +
+    "\n" +
+    "    <tbody>\r" +
+    "\n" +
+    "    <tr ng-repeat=\"c in list\">\r" +
+    "\n" +
+    "        <td>{{c.name}}</td>\r" +
+    "\n" +
+    "        <td>{{c.endPoint}}</td>\r" +
+    "\n" +
+    "        <td>{{c.pathToData}}</td>\r" +
+    "\n" +
+    "        <td>{{c.pathToError}}</td>\r" +
+    "\n" +
+    "        <td>{{c.language}}</td>\r" +
+    "\n" +
+    "        <td>\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-click=\"editInDialog(c)\"><i class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-danger\" ng-click=\"remove(c)\"><i class=\"glyphicon glyphicon-remove\"></i></button>\r" +
+    "\n" +
+    "        </td>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "</table>"
+  );
+
+
+  $templateCache.put('/app/views/editCluster.html',
+    "<div class=\"edit-cluster_title\">\r" +
+    "\n" +
+    "    <h2>Edit cluster</h2>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"row edit-cluster_content\">\r" +
+    "\n" +
+    "    <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Name:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.name\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">End point:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.endPoint\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Path to data:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.pathToData\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Path to error:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"cluster.pathToError\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Language:</label>\r" +
+    "\n" +
+    "            <div class=\"btn-group\" dropdown>\r" +
+    "\n" +
+    "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{cluster.language || '- choose language -'}}<span class=\"caret\"></span>\r" +
+    "\n" +
+    "                </button>\r" +
+    "\n" +
+    "                <ul class=\"dropdown-menu\" role=\"menu\">\r" +
+    "\n" +
+    "                    <li ng-repeat=\"p in plugins\">\r" +
+    "\n" +
+    "                        <a ng-click=\"cluster.language = p.queryLanguage\">{{p.queryLanguage}}</a>\r" +
+    "\n" +
+    "                    </li>\r" +
+    "\n" +
+    "                </ul>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"col-lg-12 edit-luster_buttons\">\r" +
+    "\n" +
+    "        <p class=\"clearfix\">\r" +
+    "\n" +
+    "            <button class=\"btn btn-default pull-right\" ng-click=\"close()\">Close</button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-primary pull-right\" ng-click=\"save()\">Save</button>\r" +
+    "\n" +
+    "        </p>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('/app/views/editNotebook.html',
+    "<div class=\"edit-notebook_title\">\r" +
+    "\n" +
+    "    <h2>Edit notebook</h2>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"row edit-notebook_content\">\r" +
+    "\n" +
+    "    <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "        <div class=\"form-group\">\r" +
+    "\n" +
+    "            <label class=\"\">Name:</label>\r" +
+    "\n" +
+    "            <input type=\"text\" ng-model=\"notebook.name\" class=\"form-control\"/>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"col-lg-12 edit-luster_buttons\">\r" +
+    "\n" +
+    "        <p class=\"clearfix\">\r" +
+    "\n" +
+    "            <button class=\"btn btn-default pull-right\" ng-click=\"close()\">Close</button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-primary pull-right\" ng-click=\"save()\">Save</button>\r" +
+    "\n" +
+    "        </p>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('/app/views/index.html',
     "<div class=\"notebook-error-message\" ng-if=\"errorMessage\">{{errorMessage}}</div>\r" +
     "\n" +
@@ -96830,15 +97226,49 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "</h3>\r" +
     "\n" +
-    "<ul>\r" +
+    "\r" +
     "\n" +
-    "    <li ng-repeat=\"n in notebooks | filter:n.id\">\r" +
+    "<table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
     "\n" +
-    "        <a ng-href=\"#/canvas/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a>\r" +
+    "    <colgroup>\r" +
     "\n" +
-    "    </li>\r" +
+    "        <col>\r" +
     "\n" +
-    "</ul>"
+    "        <col width=\"110\">\r" +
+    "\n" +
+    "    </colgroup>\r" +
+    "\n" +
+    "    <thead>\r" +
+    "\n" +
+    "    <tr>\r" +
+    "\n" +
+    "        <th>Name</th>\r" +
+    "\n" +
+    "        <th></th>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </thead>\r" +
+    "\n" +
+    "    <tbody>\r" +
+    "\n" +
+    "    <tr ng-repeat=\"n in notebooks\">\r" +
+    "\n" +
+    "        <td><a ng-href=\"#/notebook/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a></td>\r" +
+    "\n" +
+    "        <td>\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-click=\"editInDialog(n)\"><i class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
+    "\n" +
+    "            <button class=\"btn btn-danger\" ng-click=\"remove(n)\"><i class=\"glyphicon glyphicon-remove\"></i></button>\r" +
+    "\n" +
+    "        </td>\r" +
+    "\n" +
+    "    </tr>\r" +
+    "\n" +
+    "    </tbody>\r" +
+    "\n" +
+    "</table>"
   );
 
 
