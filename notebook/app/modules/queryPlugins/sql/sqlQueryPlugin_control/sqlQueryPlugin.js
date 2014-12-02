@@ -77,11 +77,11 @@ define(function (require) {
                     $scope.request = function () {
                         clearTimeout($scope.updateTimeout);
                         $scope.updateTimeout = null;
-                        if (!$scope.block.query) {
+                        if (!$scope.block.query || !$scope.block.cluster) {
                             return;
                         }
                         $scope.isExecuting = true;
-                        service.execute($scope.block.cluster.endPoint, $scope.block.query).then(function (data) {
+                        service.execute($scope.block).then(function (data) {
                             $scope.response = data;
                             $scope.block.data = data.data || [];
                             $scope.block.error = data.error || null;

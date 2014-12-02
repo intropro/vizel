@@ -1,4 +1,5 @@
-<div class="content"  ng-class="{
+<div class="notebook-error-message" ng-if="errorMessage">{{errorMessage}}</div>
+<div class="content" ng-if="notebook"  ng-class="{
     'edit-mode': isEditMode,
     'view-mode': !isEditMode
     }">

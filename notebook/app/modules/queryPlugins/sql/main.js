@@ -1,6 +1,7 @@
 ;
 define(function (require) {
     require('./sqlQueryPlugin_control/sqlQueryPlugin');
+    require('./controller');
     var moduleContainer = require('./ngModule');
     var plugin = {
         name: 'sqlQueryPlugin',

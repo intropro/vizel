@@ -1,18 +1,26 @@
 ;
 define(function (require, exports, module) {
-    require('../services/notebookBlockService');
     var notebookBlock = require('../models/notebookBlock');
     module.exports = require('../ngModule')
         .controller('IndexController', [
             '$scope',
-            'notebookBlockService',
+            'notebookService',
             '$interval',
             '$routeParams',
-            function ($scope, notebookBlockService, $interval, $routeParams) {
+            function ($scope, notebookService, $interval, $routeParams) {
                 var autoSaveInterval = $interval(function () {
-//                    notebookBlockService.saveOne($scope.notebook);
-                    notebookBlockService.saveAll($scope.blocks);
-                }, 2000);
+                    if($scope.notebook){
+                        notebookService.saveOne($scope.notebook);
+                    }
+                }, 1000);
+
+                $scope.$on("$destroy", function() {
+                    if (autoSaveInterval) {
+                        $interval.cancel(autoSaveInterval);
+                    }
+                });
+
+                $scope.errorMessage = null;
 
                 $scope.isEditMode = !(localStorage.getItem('isViewMode') === 'true');
                 $scope.$watch('isEditMode', function () {
@@ -20,15 +28,14 @@ define(function (require, exports, module) {
                 });
                 $scope.notebook = null;
                 $scope.blocks = [];
-                notebookBlockService.getAll().then(function (blocks) {
-                    $scope.blocks = blocks;
-                });
-/*
-                notebookBlockService.getById().then(function (notebook) {
+
+                notebookService.getById(+$routeParams.id).then(function (notebook) {
                     $scope.notebook = notebook;
                     $scope.blocks = notebook.blocks;
+                }, function(message){
+                    $scope.errorMessage = message || 'Notebook not found'
                 });
-*/
+
 
                 $scope.blurEditor = function () {
                     if (!$scope.$$phase) {

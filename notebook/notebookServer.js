@@ -54,7 +54,10 @@ app.post('/query', function(req, res, next){
             if (err) {
                 console.log('Err: ', err);
                 res.send({
-                    data: [err]
+                    data: [err],
+                    error: err,
+                    data2: [err],
+                    error2: err
                 });
                 return;
             }
@@ -62,6 +65,7 @@ app.post('/query', function(req, res, next){
 //            console.log('The response is: ', rows, fields);
             console.log('Success: return ' + rows.length + ' rows.', fields);
             res.send({
+                data2: rows,
                 data: rows
             });
         });
@@ -95,6 +99,7 @@ app.use(function(req, res){
 
 /* istanbul ignore next */
 if (!module.parent) {
-    app.listen(9090);
-    console.log('Express started on port 3000');
+    var port = 9090;
+    app.listen(port);
+    console.log('Express started on port ' + port);
 }

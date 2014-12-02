@@ -481,7 +481,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
 
 
   $templateCache.put('/app/views/index.html',
-    "<div class=\"content\"  ng-class=\"{\r" +
+    "<div class=\"notebook-error-message\" ng-if=\"errorMessage\">{{errorMessage}}</div>\r" +
+    "\n" +
+    "<div class=\"content\" ng-if=\"notebook\"  ng-class=\"{\r" +
     "\n" +
     "    'edit-mode': isEditMode,\r" +
     "\n" +
@@ -534,13 +536,23 @@ define(function (require) { require('angular').module('templateCache').run(['$te
 
 
   $templateCache.put('/app/views/notebooks.html',
-    "<h3>Saved notebooks</h3>\r" +
+    "<h3>\r" +
+    "\n" +
+    "    Saved notebooks\r" +
+    "\n" +
+    "    <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
+    "\n" +
+    "        Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "    </button>\r" +
+    "\n" +
+    "</h3>\r" +
     "\n" +
     "<ul>\r" +
     "\n" +
-    "    <li ng-repeat=\"n in notebooks\">\r" +
+    "    <li ng-repeat=\"n in notebooks | filter:n.id\">\r" +
     "\n" +
-    "        <a ng-href=\"#/{{n.id}}\">{{n.name || \"notebook № \" + n.id}}</a>\r" +
+    "        <a ng-href=\"#/canvas/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a>\r" +
     "\n" +
     "    </li>\r" +
     "\n" +

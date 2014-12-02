@@ -2161,3 +2161,9 @@ body .CodeMirror {
   margin-bottom: 10px;
   padding: 0 15px;
 }
+.notebook-error-message {
+  color: #780b00;
+  font-size: 18px;
+  text-align: center;
+  margin: 20px 0;
+}

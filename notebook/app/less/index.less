@@ -7,7 +7,6 @@
 @import "../modules/queryPlugins/sql/index";
 @import "../modules/queryPlugins/markdown/index";
 
-
 // Grid with no gutters
 .row.no-gutter {
   margin-left: 0;
@@ -86,7 +85,7 @@ body .CodeMirror {
 
 .block-options-label {
   display: block;
-  color:#8C8C8C;
+  color: #8C8C8C;
 }
 
 .block-list {
@@ -97,4 +96,27 @@ body .CodeMirror {
 .view-edit-buttons-container {
   margin-bottom: 10px;
   padding: 0 15px;
+}
+
+.notebook-error-message {
+  color: #780b00;
+  font-size: 18px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.edit-notebook_content,
+.edit-cluster_content {
+  padding: 10px 10px 0 10px;
+}
+
+.edit-notebook_title,
+.edit-cluster_title {
+  padding: 0 10px;
+  text-align: center;
+}
+
+.edit-notebook_buttons .btn + .btn,
+.edit-luster_buttons .btn + .btn {
+  margin-right: 5px;
 }

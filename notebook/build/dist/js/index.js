@@ -95102,13 +95102,16 @@ define('app/services/queryPluginsManager',['require','../ngModule'],function (re
 define('app/config',['require','./services/queryPluginsManager','./ngModule','sqlQueryPluginModule','markdownQueryPluginModule'],function (require) {
     require('./services/queryPluginsManager');
     require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
-        $routeProvider.when('/list', {
+        $routeProvider.when('/canvas', {
             templateUrl: '/app/views/notebooks.html',
             controller: 'NotebookListController'
         });
-        $routeProvider.when('/', {
+        $routeProvider.when('/canvas/:id', {
             templateUrl: '/app/views/index.html',
             controller: 'IndexController'
+        });
+        $routeProvider.otherwise({
+            redirectTo: '/canvas'
         });
         var sqlPlugin = require('sqlQueryPluginModule');
         var markdownPlugin = require('markdownQueryPluginModule');
@@ -95288,13 +95291,16 @@ define('app/controllers/IndexController',['require','exports','module','../servi
         .controller('IndexController', [
             '$scope',
             'notebookBlockService',
+            'notebookService',
             '$interval',
             '$routeParams',
-            function ($scope, notebookBlockService, $interval, $routeParams) {
+            function ($scope, notebookBlockService, notebookService, $interval, $routeParams) {
                 var autoSaveInterval = $interval(function () {
 //                    notebookBlockService.saveOne($scope.notebook);
                     notebookBlockService.saveAll($scope.blocks);
                 }, 2000);
+
+                $scope.errorMessage = null;
 
                 $scope.isEditMode = !(localStorage.getItem('isViewMode') === 'true');
                 $scope.$watch('isEditMode', function () {
@@ -95302,15 +95308,14 @@ define('app/controllers/IndexController',['require','exports','module','../servi
                 });
                 $scope.notebook = null;
                 $scope.blocks = [];
-                notebookBlockService.getAll().then(function (blocks) {
-                    $scope.blocks = blocks;
-                });
-/*
-                notebookBlockService.getById().then(function (notebook) {
+
+                notebookService.getById(+$routeParams.id).then(function (notebook) {
                     $scope.notebook = notebook;
                     $scope.blocks = notebook.blocks;
+                }, function(message){
+                    $scope.errorMessage = message || 'Notebook not found'
                 });
-*/
+
 
                 $scope.blurEditor = function () {
                     if (!$scope.$$phase) {
@@ -95363,17 +95368,25 @@ define('app/services/notebookService',['require','angular','../models/notebookBl
             plugins[p.name] = p;
         });
 
+        this.canvasList = [];
+        var canvasListByIds = [];
+
         /**
          * @param {number} id
          */
-        this.getById = function(id){
+        this.getById = function (id) {
             var defer = $q.defer();
-            this.getAll().then(function(list){
-                var notebook = list.filter(function(n){
+
+            this.getAll().then(function (list) {
+                var notebook = list.filter(function (n) {
                     return n.id === id;
                 })[0];
-                defer.resolve(notebook);
-            }, function(){
+                if(notebook){
+                    defer.resolve(notebook);
+                } else {
+                    defer.reject();
+                }
+            }, function () {
                 defer.reject('Something went wrong');
             });
 
@@ -95385,10 +95398,9 @@ define('app/services/notebookService',['require','angular','../models/notebookBl
          */
         this.getAll = function () {
             var defer = $q.defer();
+            this._restoreAll();
 
-            var notebooksJson = ng.fromJson(localStorage.getItem(notebooksLocalStorageItemName) || []);
-
-            var notebookList = notebooksJson.map(function (n) {
+            var notebookList = this.canvasList.map(function (n) {
                 var notebook = {
                     id: n.id,
                     name: n.name
@@ -95405,10 +95417,6 @@ define('app/services/notebookService',['require','angular','../models/notebookBl
             defer.resolve(notebookList);
 
             return defer.promise;
-        };
-
-        this.saveOne = function(notebook){
-
         };
 
         /**
@@ -95460,12 +95468,124 @@ define('app/services/notebookService',['require','angular','../models/notebookBl
             }
             defer.resolve();
             return defer.promise;
+        };
+
+        this.saveOne = function (canvas) {
+            var defer = $q.defer();
+            this._restoreAll();
+            if (canvas.id === 0) {
+                canvas.id = canvasListByIds.length + 1;
+                canvasListByIds[canvas.id] = canvas;
+                this.canvasList.push(canvas);
+            } else {
+                var existed = canvasListByIds[canvas.id];
+                if(existed){
+                    ng.extend(existed, canvas);
+                } else {
+                    canvasListByIds[canvas.id] = canvas;
+                    this.canvasList.push(canvas);
+                }
+            }
+            this._saveAll();
+            defer.resolve(canvas);
+            return defer.promise;
+        };
+
+        this._restoreAll = function () {
+            this.canvasList = getAllJson();
+            var arr = [];
+            this.canvasList.forEach(function (c) {
+                arr[c.id] = c
+            });
+            canvasListByIds.length = 0;
+            canvasListByIds.push.apply(canvasListByIds, arr);
+        };
+
+        this._saveAll = function () {
+            var jsonStr = toJson(this.canvasList);
+            localStorage.setItem(notebooksLocalStorageItemName, jsonStr);
+        };
+
+
+        function getAllJson() {
+            var allCanvasJson = ng.fromJson(localStorage.getItem(notebooksLocalStorageItemName) || []);
+            return allCanvasJson;
+        }
+
+        function toJson(canvasList){
+            var obj = canvasList.map(function(c){
+                return {
+                    id: c.id,
+                    name: c.name,
+                    blocks: c.blocks.map(function(b){
+                        return blockToObj(b);
+                    })
+                }
+            });
+            return ng.toJson(obj);
+        }
+
+        function blockToObj(b){
+            var json = {
+                in: b.in,
+                type: b.type,
+                pluginName: b.plugin ? b.plugin.name : null,
+                options: {
+                    key: b.options.key,
+                    value: b.options.value,
+                    availableKeys: b.options.availableKeys,
+                    availableValues: b.options.availableValues
+                },
+                isExecuted: b.isExecuted,
+                updatePeriod: b.updatePeriod,
+                queryLanguage: b.queryLanguage,
+                cluster: b.cluster ? { name: b.cluster.name, endPoint: b.cluster.endPoint} : null,
+                size: b.size,
+                variables: b.variables.map(function (v) {
+                    return {
+                        name: v.name,
+                        label: v.label,
+                        value: v.value
+                    };
+                })
+            };
+            return json;
         }
     });
 });
 ;
-define('app/controllers/NotebookListController',['require','../services/notebookService','../ngModule'],function (require) {
+define('app/models/canvas',['require','angular','./notebookBlock'],function (require) {
+    var ng = require('angular');
+    var notebookBlock = require('./notebookBlock');
+
+    function Canvas(json) {
+        var data = ng.extend({
+            id: 0,
+            name: "[Brand new]",
+            blocks: []
+        }, json);
+
+        this.id = data.id;
+        this.name = data.name;
+        this.blocks = data.blocks.map(function(b){
+            return notebookBlock.factory(b);
+        });
+    }
+
+    function factory(json){
+        var instance = new Canvas(json);
+        return instance;
+    }
+
+    return {
+        factory: factory,
+        ctor: Canvas
+    };
+});
+;
+define('app/controllers/NotebookListController',['require','../services/notebookService','../models/canvas','../ngModule'],function (require) {
     require('../services/notebookService');
+    var canvas = require('../models/canvas');
     require('../ngModule').controller('NotebookListController', [
         '$scope',
         'notebookService',
@@ -95477,6 +95597,15 @@ define('app/controllers/NotebookListController',['require','../services/notebook
             }, function (error) {
 
             });
+
+            $scope.createNew = function(){
+                var newCanvas = canvas.factory();
+                notebookService.saveOne(newCanvas).then(function(savedCanvas){
+                    $scope.notebooks.unshift(savedCanvas);
+                }, function(){
+                    alert('Error!');
+                });
+            };
         }
     ]);
 });
@@ -96634,7 +96763,9 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
 
 
   $templateCache.put('/app/views/index.html',
-    "<div class=\"content\"  ng-class=\"{\r" +
+    "<div class=\"notebook-error-message\" ng-if=\"errorMessage\">{{errorMessage}}</div>\r" +
+    "\n" +
+    "<div class=\"content\" ng-if=\"notebook\"  ng-class=\"{\r" +
     "\n" +
     "    'edit-mode': isEditMode,\r" +
     "\n" +
@@ -96687,13 +96818,23 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
 
 
   $templateCache.put('/app/views/notebooks.html',
-    "<h3>Saved notebooks</h3>\r" +
+    "<h3>\r" +
+    "\n" +
+    "    Saved notebooks\r" +
+    "\n" +
+    "    <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
+    "\n" +
+    "        Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "    </button>\r" +
+    "\n" +
+    "</h3>\r" +
     "\n" +
     "<ul>\r" +
     "\n" +
-    "    <li ng-repeat=\"n in notebooks\">\r" +
+    "    <li ng-repeat=\"n in notebooks | filter:n.id\">\r" +
     "\n" +
-    "        <a ng-href=\"#/{{n.id}}\">{{n.name || \"notebook № \" + n.id}}</a>\r" +
+    "        <a ng-href=\"#/canvas/{{n.id}}\">{{n.name || \"notebook № \" + n.id}} ({{n.id}})</a>\r" +
     "\n" +
     "    </li>\r" +
     "\n" +
