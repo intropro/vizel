@@ -28,6 +28,11 @@
     </div>
 </div>
 
+<div class="" ng-if="block.type === types.bigNumberChart">
+    <div class="presentation-control-container-chart" plot-big-number-chart plot-data="block">
+    </div>
+</div>
+
 <div class="presentation-block-buttons">
     <div style="padding-bottom: 15px;">
         <button class="btn btn-default" ng-class="{active: block.type === types.grid}"
@@ -61,8 +66,10 @@
             <i class="glyphicon glyphicon-dashboard"></i>
         </button>
 
-
-
+        <button class="btn btn-default" ng-class="{active: block.type === types.bigNumberChart}"
+                ng-click="selectType(types.bigNumberChart)">
+            <i class="glyphicon glyphicon-sound-5-1"></i>
+        </button>
 
         <button class="btn btn-default" ng-hide="block.type == types.grid"
                 ng-click="showPlotOptions(block, plotOptions)">

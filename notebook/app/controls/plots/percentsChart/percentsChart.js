@@ -8,7 +8,7 @@ define(function (require) {
 //        el.classed('plot', true);
         //el.html('');
 
-        var τ = 2 * Math.PI; // http://tauday.com/tau-manifesto
+        var t = 2 * Math.PI; // http://tauday.com/tau-manifesto
 
         var offsetWidth,
             offsetHeight,
@@ -49,7 +49,7 @@ define(function (require) {
         var svg = svgRoot.append("g");
 
         // Add the background arc, from 0 to 100% (τ).
-        var background = svg.append("path").datum({endAngle: τ});
+        var background = svg.append("path").datum({endAngle: t});
         // Add the foreground arc in orange, currently showing 12.7%.
         var foreground = svg.append("path");
 
@@ -70,7 +70,7 @@ define(function (require) {
                 return Math.round(d.val);
             });
 
-            var newAngle = perc / 100 * τ;
+            var newAngle = perc / 100 * t;
 
             // The function passed to attrTween is invoked for each selected element when
             // the transition starts, and for each element returns the interpolator to use
@@ -89,7 +89,7 @@ define(function (require) {
                 // newAngle; and for 0 < t < 1 it returns an angle in-between.
                 var interpolate = d3.interpolate(d.endAngle, newAngle);
 
-                isIncreased = newAngle > d.endAngle;
+                isIncreased = d.endAngle <= newAngle;
 
                 plotLabel.classed('up', isIncreased);
                 plotLabel.classed('down', !isIncreased);
@@ -155,7 +155,6 @@ define(function (require) {
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
             text
-                .style("text-anchor", "middle")
                 .attr("font-weight", "bold")
                 .style("font-size", fontSize + "px")
                 .style("line-height", fontSize + "px")
@@ -179,7 +178,7 @@ define(function (require) {
                 .attr("d", arc);
 
             foreground
-                .datum({endAngle: data.val / 100 * τ})
+                .datum({endAngle: data.val / 100 * t})
                 .style("fill", "rgb(2, 108, 163)")
                 .attr("d", arc);
         }

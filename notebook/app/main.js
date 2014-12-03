@@ -9,4 +9,5 @@ define(function(require){
     require('./controls/plots/pieChart/pieChart');
     require('./controls/plots/mapChart/mapChart');
     require('./controls/plots/percentsChart/percentsChart');
+    require('./controls/plots/bigNumberChart/bigNumberChart');
 });

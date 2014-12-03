@@ -48,6 +48,13 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/controls/plots/bigNumberChart/bigNumberChart.html',
+    "<div class=\"big-number-chart\">\r" +
+    "\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('/app/controls/plots/grid/grid.html',
     "<div class=\"plot-grid\">\r" +
     "\n" +
@@ -178,6 +185,16 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
+    "<div class=\"\" ng-if=\"block.type === types.bigNumberChart\">\r" +
+    "\n" +
+    "    <div class=\"presentation-control-container-chart\" plot-big-number-chart plot-data=\"block\">\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
     "<div class=\"presentation-block-buttons\">\r" +
     "\n" +
     "    <div style=\"padding-bottom: 15px;\">\r" +
@@ -244,9 +261,13 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "\r" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.bigNumberChart}\"\r" +
     "\n" +
-    "\r" +
+    "                ng-click=\"selectType(types.bigNumberChart)\">\r" +
+    "\n" +
+    "            <i class=\"glyphicon glyphicon-sound-5-1\"></i>\r" +
+    "\n" +
+    "        </button>\r" +
     "\n" +
     "\r" +
     "\n" +

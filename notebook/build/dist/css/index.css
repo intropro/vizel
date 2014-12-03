@@ -826,12 +826,12 @@ Interactive Layer
 .CodeMirror div.CodeMirror-secondarycursor {
   border-left: 1px solid silver;
 }
-.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {
+.CodeMirror.cm-fat-cursor div.CodeMirror-cursor {
   width: auto;
   border: 0;
   background: #7e7;
 }
-.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursors {
+.CodeMirror.cm-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
 
@@ -899,6 +899,7 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 .cm-header, .cm-strong {font-weight: bold;}
 .cm-em {font-style: italic;}
 .cm-link {text-decoration: underline;}
+.cm-strikethrough {text-decoration: line-through;}
 
 .cm-s-default .cm-error {color: #f00;}
 .cm-invalidchar {color: #f00;}
@@ -982,6 +983,11 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   /* Hack to make IE7 behave */
   *zoom:1;
   *display:inline;
+}
+.CodeMirror-gutter-wrapper {
+  position: absolute;
+  z-index: 4;
+  height: 100%;
 }
 .CodeMirror-gutter-elt {
   position: absolute;
@@ -1078,6 +1084,9 @@ div.CodeMirror-cursors {
     visibility: hidden;
   }
 }
+
+/* See issue #2901 */
+.cm-tab-wrap-hack:after { content: ''; }
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
@@ -2161,6 +2170,43 @@ body .CodeMirror {
   display: inline-block;
 }
 .percents-chart .points {
+  font-size: 30px;
+  font-weight: bold;
+}
+.big-number-chart {
+  height: 100%;
+  position: relative;
+}
+.big-number-chart .plot-label {
+  text-align: center;
+  font-size: 0px;
+  position: absolute;
+  /* border: 1px solid #ddd; */
+}
+.big-number-chart .arrow {
+  display: inline-block;
+  font-size: 30px;
+  font-weight: bold;
+}
+.big-number-chart .arrow.up {
+  color: green;
+}
+.big-number-chart .arrow.down {
+  color: red;
+}
+.big-number-chart .down .arrow.up,
+.big-number-chart .up .arrow.down {
+  display: none;
+}
+.big-number-chart .value {
+  font-size: 100px;
+}
+.big-number-chart .points,
+.big-number-chart .value {
+  color: #01437b;
+  display: inline-block;
+}
+.big-number-chart .points {
   font-size: 30px;
   font-weight: bold;
 }
