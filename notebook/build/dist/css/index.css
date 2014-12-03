@@ -2167,13 +2167,8 @@ body .CodeMirror {
   text-align: center;
   margin: 20px 0;
 }
-.edit-notebook_content,
-.edit-cluster_content {
-  padding: 10px 10px 0 10px;
-}
 .edit-notebook_title,
 .edit-cluster_title {
-  padding: 0 10px;
   text-align: center;
 }
 .edit-notebook_buttons .btn + .btn,
