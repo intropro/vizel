@@ -5,7 +5,8 @@ define(function (require) {
     var plugin = {
         name: 'markdownQueryPlugin',
         queryLanguage: 'markdown',
-        snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html'
+        snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html',
+        needCluster: false
     };
 
     return {

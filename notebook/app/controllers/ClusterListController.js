@@ -27,6 +27,10 @@ define(function (require) {
                     $scope.cluster = cluster;
                     $scope.plugins = plugins;
 
+                    if(!cluster.language && plugins.length > 0){
+                        cluster.language = plugins[0].queryLanguage;
+                    }
+
                     $scope.close = function () {
                         $modalInstance.close();
                     };
@@ -39,7 +43,9 @@ define(function (require) {
                 size: '',
                 resolve: {
                     plugins: function(){
-                        var plugins = queryPluginsManager.getAll();
+                        var plugins = queryPluginsManager.getAll().filter(function(p){
+                            return p.needCluster === true;
+                        });
                         return plugins;
                     },
                     cluster: function () {
@@ -48,8 +54,6 @@ define(function (require) {
                 }
             });
         };
-
-        $scope.plugins = queryPluginsManager.getAll();
 
         clusterService.getAll().then(function (clusters) {
             $scope.list = clusters;

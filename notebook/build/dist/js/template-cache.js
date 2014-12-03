@@ -501,7 +501,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <tr ng-repeat=\"c in list\">\r" +
     "\n" +
-    "        <td>{{c.name}}</td>\r" +
+    "        <td><a ng-click=\"editInDialog(c)\">{{c.name}}</a></td>\r" +
     "\n" +
     "        <td>{{c.endPoint}}</td>\r" +
     "\n" +

@@ -7,7 +7,8 @@ define(function (require) {
         name: 'sqlQueryPlugin',
         queryLanguage: 'SQL',
         snippetUrl: '/app/modules/queryPlugins/sql/snippet.html',
-        blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html'
+        blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html',
+        needCluster: true
     };
 
     return {

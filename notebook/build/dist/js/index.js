@@ -93287,7 +93287,8 @@ define('sqlQueryPluginModule/main',['require','./sqlQueryPlugin_control/sqlQuery
         name: 'sqlQueryPlugin',
         queryLanguage: 'SQL',
         snippetUrl: '/app/modules/queryPlugins/sql/snippet.html',
-        blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html'
+        blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html',
+        needCluster: true
     };
 
     return {
@@ -95115,7 +95116,8 @@ define('markdownQueryPluginModule/main',['require','./markdownQueryPlugin_contro
     var plugin = {
         name: 'markdownQueryPlugin',
         queryLanguage: 'markdown',
-        snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html'
+        snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html',
+        needCluster: false
     };
 
     return {
@@ -95781,7 +95783,9 @@ define('app/controllers/ClusterListController',['require','../services/queryPlug
                 size: '',
                 resolve: {
                     plugins: function(){
-                        var plugins = queryPluginsManager.getAll();
+                        var plugins = queryPluginsManager.getAll().filter(function(p){
+                            return p.needCluster === true;
+                        });
                         return plugins;
                     },
                     cluster: function () {
@@ -95790,8 +95794,6 @@ define('app/controllers/ClusterListController',['require','../services/queryPlug
                 }
             });
         };
-
-        $scope.plugins = queryPluginsManager.getAll();
 
         clusterService.getAll().then(function (clusters) {
             $scope.list = clusters;
@@ -97006,7 +97008,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "    <tr ng-repeat=\"c in list\">\r" +
     "\n" +
-    "        <td>{{c.name}}</td>\r" +
+    "        <td><a ng-click=\"editInDialog(c)\">{{c.name}}</a></td>\r" +
     "\n" +
     "        <td>{{c.endPoint}}</td>\r" +
     "\n" +
