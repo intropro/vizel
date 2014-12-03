@@ -107,6 +107,11 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/controls/plots/percentsChart/percentsChart.html',
+    "<div class=\"percents-chart\"></div>"
+  );
+
+
   $templateCache.put('/app/controls/plots/pieChart/pieChart.html',
     "<div nvd3 class=\"plot-pie-chart\" data=\"data\" options='options'></div>"
   );
@@ -155,7 +160,17 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "<div class=\"\" ng-if=\"block.type === types.mapChart\">\r" +
     "\n" +
-    "    <div class=\"presentation-control-container-table\" plot-map-chart plot-data=\"block\">\r" +
+    "    <div class=\"presentation-control-container-chart\" plot-map-chart plot-data=\"block\">\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "<div class=\"\" ng-if=\"block.type === types.percentsChart\">\r" +
+    "\n" +
+    "    <div class=\"presentation-control-container-chart\" plot-percents-chart plot-data=\"block\">\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
@@ -214,6 +229,16 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "                ng-click=\"selectType(types.mapChart)\">\r" +
     "\n" +
     "            <i class=\"icon__usa-map_14\"></i>\r" +
+    "\n" +
+    "        </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.percentsChart}\"\r" +
+    "\n" +
+    "                ng-click=\"selectType(types.percentsChart)\">\r" +
+    "\n" +
+    "            <i class=\"glyphicon glyphicon-dashboard\"></i>\r" +
     "\n" +
     "        </button>\r" +
     "\n" +
@@ -739,7 +764,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            'col-lg-4 col-md-6 col-sm-12': block.size === 4,\r" +
     "\n" +
-    "            'col-lg-3 col-md-4 col-sm-6': block.size === 3\r" +
+    "            'col-lg-3 col-md-4 col-sm-6': block.size === 3,\r" +
+    "\n" +
+    "            'col-lg-2 col-md-3 col-sm-4': block.size === 2\r" +
     "\n" +
     "        }\"\r" +
     "\n" +

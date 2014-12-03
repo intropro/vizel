@@ -19,7 +19,12 @@
 </div>
 
 <div class="" ng-if="block.type === types.mapChart">
-    <div class="presentation-control-container-table" plot-map-chart plot-data="block">
+    <div class="presentation-control-container-chart" plot-map-chart plot-data="block">
+    </div>
+</div>
+
+<div class="" ng-if="block.type === types.percentsChart">
+    <div class="presentation-control-container-chart" plot-percents-chart plot-data="block">
     </div>
 </div>
 
@@ -49,6 +54,11 @@
         <button class="btn btn-default" ng-class="{active: block.type === types.mapChart}"
                 ng-click="selectType(types.mapChart)">
             <i class="icon__usa-map_14"></i>
+        </button>
+
+        <button class="btn btn-default" ng-class="{active: block.type === types.percentsChart}"
+                ng-click="selectType(types.percentsChart)">
+            <i class="glyphicon glyphicon-dashboard"></i>
         </button>
 
 

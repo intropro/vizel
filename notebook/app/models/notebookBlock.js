@@ -65,7 +65,7 @@ define(function (require) {
             updatePeriod: null,
             cluster: null,
             size: 12,
-            availableSizes: [3,4,6,8,12],
+            availableSizes: [2,3,4,6,8,12],
             variables: []
 
         }, json);

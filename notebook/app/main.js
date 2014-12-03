@@ -8,4 +8,5 @@ define(function(require){
     require('./controls/plots/lineChart/lineChart');
     require('./controls/plots/pieChart/pieChart');
     require('./controls/plots/mapChart/mapChart');
+    require('./controls/plots/percentsChart/percentsChart');
 });

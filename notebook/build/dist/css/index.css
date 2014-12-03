@@ -2127,6 +2127,43 @@ body .CodeMirror {
 .plot-map-chart > div {
   height: 100%;
 }
+.percents-chart {
+  height: 100%;
+  position: relative;
+}
+.percents-chart .plot-label {
+  text-align: center;
+  font-size: 0px;
+  position: absolute;
+  /* border: 1px solid #ddd; */
+}
+.percents-chart .arrow {
+  display: inline-block;
+  font-size: 30px;
+  font-weight: bold;
+}
+.percents-chart .arrow.up {
+  color: green;
+}
+.percents-chart .arrow.down {
+  color: red;
+}
+.percents-chart .down .arrow.up,
+.percents-chart .up .arrow.down {
+  display: none;
+}
+.percents-chart .value {
+  font-size: 100px;
+}
+.percents-chart .points,
+.percents-chart .value {
+  color: #01437b;
+  display: inline-block;
+}
+.percents-chart .points {
+  font-size: 30px;
+  font-weight: bold;
+}
 .icon__usa-map_14 {
   height: 14px;
   width: 14px;
