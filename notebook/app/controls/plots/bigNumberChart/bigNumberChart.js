@@ -11,7 +11,7 @@ define(function (require) {
         var lastNumber = number || 0;
 
         var data = {
-            val: number
+            val: lastNumber
         };
 
         var offsetWidth,
@@ -20,7 +20,8 @@ define(function (require) {
             height,
             padding,
             fontSize,
-            isIncreased = true;
+            isIncreased = true,
+            numberWidth;
 
         var plotLabel = el.append('div').attr('class', 'plot-label');
         plotLabel.classed('up', isIncreased);
@@ -31,7 +32,11 @@ define(function (require) {
 
         var arrow = plotLabel.selectAll('.arrow');
         var text = plotLabel.append('span').attr('class', 'value').datum(data);
-        var points = plotLabel.append('span').attr('class', 'points').text('%');
+        var textUtilSpan = plotLabel.append('span')
+            .attr('class', 'value')
+            .style('position', 'absolute')
+            .style('visibility', 'hidden')
+            .datum(data);
 
         onResize();
 
@@ -46,38 +51,59 @@ define(function (require) {
             width = offsetWidth > offsetHeight ? offsetHeight : offsetWidth;
             height = width;
             padding = width / 20;
-            fontSize = height * 2 / 3;
+            fontSize = height / 4;
         }
 
         function updateSizes() {
-            text
-                .attr("font-weight", "bold")
+            plotLabel
+                .style('width', width - padding * 2 + 'px')
+                .style('left', padding + 'px')
+                .style('top', (height - fontSize) / 2 + 'px');
+
+            arrow
+                .style('font-size', fontSize / 4 + 'px');
+
+            var arrowWidth = $(arrow.node()).width();
+            var plotLabelWidth = $(plotLabel.node()).width();
+            numberWidth = plotLabelWidth - arrowWidth;
+
+            calculateFontSizeByNumberLength();
+        }
+
+        function calculateFontSizeByNumberLength(number) {
+            textUtilSpan
                 .style("font-size", fontSize + "px")
                 .style("line-height", fontSize + "px")
                 .text(function (d) {
                     return format(d.val);
                 });
-
-            plotLabel
-                .style('width', width - padding * 2 + 'px')
-                .style('left', padding + 'px')
-                .style('top', padding + (height - fontSize) / 2 + 'px');
-
-            arrow
-                .style('font-size', fontSize / 3 + 'px');
-
-            points
-                .style('font-size', fontSize / 3 + 'px');
+            var textFontSize = fontSize;
+//            setTimeout(function () {
+                var node = $(textUtilSpan.node());
+                var w = node.width();
+                var h = node.height();
+                var width2Height = w/h;
+                var fontCoef = width2Height/(numberWidth/fontSize);
+                if (w > numberWidth) {
+                    textFontSize = fontSize / fontCoef;
+                }
+                text
+                    .style("font-size", textFontSize + "px")
+                    .style("line-height", textFontSize + "px")
+                    .text(function (d) {
+                        return format(d.val);
+                    });
+//            }, 0);
         }
 
         function updateData(number) {
             data.val = number;
             isIncreased = lastNumber <= number;
+            lastNumber = number;
             plotLabel.classed('up', isIncreased);
             plotLabel.classed('down', !isIncreased);
-            text.text(function (d) {
-                return format(d.val);
-            });
+
+            calculateFontSizeByNumberLength(data.val);
         }
 
 

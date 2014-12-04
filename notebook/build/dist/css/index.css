@@ -826,12 +826,12 @@ Interactive Layer
 .CodeMirror div.CodeMirror-secondarycursor {
   border-left: 1px solid silver;
 }
-.CodeMirror.cm-fat-cursor div.CodeMirror-cursor {
+.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {
   width: auto;
   border: 0;
   background: #7e7;
 }
-.CodeMirror.cm-fat-cursor div.CodeMirror-cursors {
+.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
 
@@ -899,7 +899,6 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 .cm-header, .cm-strong {font-weight: bold;}
 .cm-em {font-style: italic;}
 .cm-link {text-decoration: underline;}
-.cm-strikethrough {text-decoration: line-through;}
 
 .cm-s-default .cm-error {color: #f00;}
 .cm-invalidchar {color: #f00;}
@@ -983,11 +982,6 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
   /* Hack to make IE7 behave */
   *zoom:1;
   *display:inline;
-}
-.CodeMirror-gutter-wrapper {
-  position: absolute;
-  z-index: 4;
-  height: 100%;
 }
 .CodeMirror-gutter-elt {
   position: absolute;
@@ -1084,9 +1078,6 @@ div.CodeMirror-cursors {
     visibility: hidden;
   }
 }
-
-/* See issue #2901 */
-.cm-tab-wrap-hack:after { content: ''; }
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
@@ -2144,11 +2135,9 @@ body .CodeMirror {
   text-align: center;
   font-size: 0px;
   position: absolute;
-  /* border: 1px solid #ddd; */
 }
 .percents-chart .arrow {
   display: inline-block;
-  font-size: 30px;
   font-weight: bold;
 }
 .percents-chart .arrow.up {
@@ -2162,7 +2151,7 @@ body .CodeMirror {
   display: none;
 }
 .percents-chart .value {
-  font-size: 100px;
+  font-weight: bold;
 }
 .percents-chart .points,
 .percents-chart .value {
@@ -2170,7 +2159,6 @@ body .CodeMirror {
   display: inline-block;
 }
 .percents-chart .points {
-  font-size: 30px;
   font-weight: bold;
 }
 .big-number-chart {
@@ -2181,11 +2169,9 @@ body .CodeMirror {
   text-align: center;
   font-size: 0px;
   position: absolute;
-  /* border: 1px solid #ddd; */
 }
 .big-number-chart .arrow {
   display: inline-block;
-  font-size: 30px;
   font-weight: bold;
 }
 .big-number-chart .arrow.up {
@@ -2199,16 +2185,12 @@ body .CodeMirror {
   display: none;
 }
 .big-number-chart .value {
-  font-size: 100px;
+  font-weight: bold;
 }
 .big-number-chart .points,
 .big-number-chart .value {
   color: #01437b;
   display: inline-block;
-}
-.big-number-chart .points {
-  font-size: 30px;
-  font-weight: bold;
 }
 .icon__usa-map_14 {
   height: 14px;
