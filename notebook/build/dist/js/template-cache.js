@@ -942,71 +942,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            </div>\r" +
     "\n" +
-    "            <div class=\"btn-group dropdown-char-type\" dropdown>\r" +
-    "\n" +
-    "                <button type=\"button\" class=\"btn btn-default\"\r" +
-    "\n" +
-    "                        ng-class=\"{active: block.type !== types.grid}\"\r" +
-    "\n" +
-    "                        ng-click=\"selectType(prevType)\"\r" +
-    "\n" +
-    "                        >\r" +
-    "\n" +
-    "                    <i class=\"glyphicon\" ng-class=\"{\r" +
-    "\n" +
-    "                        'glyphicon-stats': prevType === types.multiBarChart,\r" +
-    "\n" +
-    "                        'glyphicon-picture': prevType === types.lineChart,\r" +
-    "\n" +
-    "                        'glyphicon-adjust': prevType === types.pieChart,\r" +
-    "\n" +
-    "                    }\"></i>\r" +
-    "\n" +
-    "                    <i class=\"icon__usa-map_14\"  ng-show=\"prevType === types.mapChart\"></i>\r" +
-    "\n" +
-    "                </button>\r" +
-    "\n" +
     "\r" +
-    "\n" +
-    "                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
-    "\n" +
-    "                    <span class=\"caret\"></span>\r" +
-    "\n" +
-    "                    <span class=\"sr-only\">Split button!</span>\r" +
-    "\n" +
-    "                </button>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "                <ul class=\"dropdown-menu\" role=\"menu\">\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.multiBarChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-stats\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.lineChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-picture\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.pieChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                    <li ng-click=\"selectType(types.mapChart)\" class=\"text-center menu-item\">\r" +
-    "\n" +
-    "                        <i class=\"icon__usa-map_14\"></i>\r" +
-    "\n" +
-    "                    </li>\r" +
-    "\n" +
-    "                </ul>\r" +
-    "\n" +
-    "            </div>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
@@ -1020,6 +956,8 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            </div>\r" +
     "\n" +
+    "\r" +
+    "\n" +
     "            <div class=\"row\" ng-if=\"block.type === types.lineChart\">\r" +
     "\n" +
     "                <div class=\"col-lg-12 presentation-control-container-chart\" plot-line-chart plot-data=\"block\">\r" +
@@ -1027,6 +965,8 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "                </div>\r" +
     "\n" +
     "            </div>\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "            <div class=\"row\" ng-if=\"block.type === types.pieChart\">\r" +
     "\n" +
@@ -1036,6 +976,8 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "            </div>\r" +
     "\n" +
+    "\r" +
+    "\n" +
     "            <div class=\"row\" ng-if=\"block.type === types.mapChart\">\r" +
     "\n" +
     "                <div class=\"col-lg-12 presentation-control-container-chart\" plot-map-chart plot-data=\"block\">\r" +
@@ -1043,6 +985,94 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "                </div>\r" +
     "\n" +
     "            </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <div class=\"\" ng-if=\"block.type === types.percentsChart\">\r" +
+    "\n" +
+    "                <div class=\"presentation-control-container-chart\" plot-percents-chart plot-data=\"block\">\r" +
+    "\n" +
+    "                </div>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <div class=\"\" ng-if=\"block.type === types.bigNumberChart\">\r" +
+    "\n" +
+    "                <div class=\"presentation-control-container-chart\" plot-big-number-chart plot-data=\"block\">\r" +
+    "\n" +
+    "                </div>\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.multiBarChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.multiBarChart)\">\r" +
+    "\n" +
+    "                <i class=\"glyphicon glyphicon-stats\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.lineChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.lineChart)\">\r" +
+    "\n" +
+    "                <i class=\"glyphicon glyphicon-picture\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.pieChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.pieChart)\">\r" +
+    "\n" +
+    "                <i class=\"glyphicon glyphicon-adjust\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.mapChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.mapChart)\">\r" +
+    "\n" +
+    "                <i class=\"icon__usa-map_14\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.percentsChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.percentsChart)\">\r" +
+    "\n" +
+    "                <i class=\"glyphicon glyphicon-dashboard\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <button class=\"btn btn-default\" ng-class=\"{active: block.type === types.bigNumberChart}\"\r" +
+    "\n" +
+    "                    ng-click=\"selectType(types.bigNumberChart)\">\r" +
+    "\n" +
+    "                <i class=\"glyphicon glyphicon-sound-5-1\"></i>\r" +
+    "\n" +
+    "            </button>\r" +
     "\n" +
     "        </div>\r" +
     "\n" +
