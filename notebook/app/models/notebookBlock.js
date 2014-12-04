@@ -2,8 +2,53 @@
 define(function (require) {
     var ng = require('angular');
     var queryVariable = require('./queryVariable');
+    var clusterModel = require('./cluster');
 
-    function NotebookBlock(json) {
+    function NotebookBlock(data) {
+        this.in = data.in;
+        this.query = data.query;
+        this.type = data.type;
+        this.isExecuted = data.isExecuted;
+        this.data = [];
+        this.error = null;
+        this.options = data.options;
+        this.updatePeriod = data.updatePeriod;
+
+        this.pluginName = data.pluginName;
+
+        this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+
+        this.availableSizes = data.availableSizes;
+        this.size = data.size || this.availableSizes[0];
+        this.variables = (data.variables || []).map(function(v){
+            return queryVariable.factory(v);
+        });
+        this.plugin = null;
+    }
+
+    function toJson(b){
+        return {
+            in: b.in,
+            type: b.type,
+            options: {
+                key: b.options.key,
+                value: b.options.value,
+                availableKeys: b.options.availableKeys,
+                availableValues: b.options.availableValues
+            },
+            isExecuted: b.isExecuted,
+            updatePeriod: b.updatePeriod,
+            pluginName: b.pluginName,
+            queryLanguage: b.queryLanguage,
+            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+            size: b.size,
+            variables: b.variables.map(function (v) {
+                return queryVariable.toJson(v)
+            })
+        };
+    }
+
+    function fromJson(json){
         var data = ng.extend({
             in: 'select state, income from reports.sells where state like "$state%"',
             query: '',
@@ -18,49 +63,23 @@ define(function (require) {
                 availableValues: []
             },
             updatePeriod: null,
-            allQueryLanguages: ['SQL', 'md'],
-            queryLanguage: 'SQL',
-            allClusters: [{
-                name: 'MySql DB',
-                endPoint: '//localhost:9090/query'
-            }],
             cluster: null,
             size: 12,
-            availableSizes: [3,4,6,8,12],
+            availableSizes: [2,3,4,6,8,12],
             variables: []
 
         }, json);
-
-        this.in = data.in;
-        this.query = data.query;
-        this.type = data.type;
-        this.isExecuted = data.isExecuted;
-        this.data = [];
-        this.error = null;
-        this.options = data.options;
-        this.updatePeriod = data.updatePeriod;
-
-        this.allQueryLanguages = data.allQueryLanguages || [];
-        this.queryLanguage = data.queryLanguage || this.allQueryLanguages[0];
-
-        this.allClusters = data.allClusters;
-        this.cluster = data.cluster || this.allClusters[0];
-
-        this.availableSizes = data.availableSizes || [3,4,6,8,12];
-        this.size = data.size || this.availableSizes[0];
-        this.variables = (data.variables || []).map(function(v){
-            return queryVariable.factory(v);
-        });
-        this.plugin = null;
+        return new NotebookBlock(data);
     }
 
     function factory(json){
-        var instance = new NotebookBlock(json);
+        var instance = fromJson(json);
         return instance;
     }
 
     return {
         factory: factory,
-        ctor: NotebookBlock
+        toJson: toJson,
+        fromJson: fromJson
     };
 });

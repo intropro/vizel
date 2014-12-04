@@ -1,10 +1,10 @@
 <div class="form-group">
     <label class="block-options-label">Cluster:</label>
     <div class="btn-group" dropdown>
-        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{block.cluster.name}}<span class="caret"></span>
+        <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{block.cluster.name || '- choose cluster -'}}<span class="caret"></span>
         </button>
-        <ul class="dropdown-menu" role="menu">
-            <li ng-repeat="cl in block.allClusters">
+        <ul class="dropdown-menu" role="menu" ng-controller="controller_sql_QueryPlugin">
+            <li ng-repeat="cl in allClusters | filter:{language: block.plugin.queryLanguage}:true">
                 <a ng-click="block.cluster = cl">{{cl.name}}</a>
             </li>
         </ul>

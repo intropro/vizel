@@ -1,8 +1,6 @@
 define(function(require){
     require('./ngModule');
     require('./config');
-    require('./controllers/IndexController');
-    require('./controllers/NotebookListController');
     require('./controls/presentationBlock/presentationBlock');
     require('./controls/notebookBlock/notebookBlock');
     require('./controls/plots/grid/grid');
@@ -10,4 +8,6 @@ define(function(require){
     require('./controls/plots/lineChart/lineChart');
     require('./controls/plots/pieChart/pieChart');
     require('./controls/plots/mapChart/mapChart');
+    require('./controls/plots/percentsChart/percentsChart');
+    require('./controls/plots/bigNumberChart/bigNumberChart');
 });

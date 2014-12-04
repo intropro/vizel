@@ -7,7 +7,6 @@
 @import "../modules/queryPlugins/sql/index";
 @import "../modules/queryPlugins/markdown/index";
 
-
 // Grid with no gutters
 .row.no-gutter {
   margin-left: 0;
@@ -67,6 +66,8 @@ body .CodeMirror {
 @import "../controls/plots/lineChart/lineChart";
 @import "../controls/plots/pieChart/pieChart";
 @import "../controls/plots/mapChart/mapChart";
+@import "../controls/plots/percentsChart/percentsChart";
+@import "../controls/plots/bigNumberChart/bigNumberChart";
 
 .usa-map-img() {
   background-image: url('../img/USA_map-128.png');
@@ -86,7 +87,7 @@ body .CodeMirror {
 
 .block-options-label {
   display: block;
-  color:#8C8C8C;
+  color: #8C8C8C;
 }
 
 .block-list {
@@ -98,3 +99,27 @@ body .CodeMirror {
   margin-bottom: 10px;
   padding: 0 15px;
 }
+
+.notebook-error-message {
+  color: #780b00;
+  font-size: 18px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.edit-notebook_content,
+.edit-cluster_content {
+}
+
+.edit-notebook_title,
+.edit-cluster_title {
+  text-align: center;
+}
+
+.edit-notebook_buttons .btn + .btn,
+.edit-luster_buttons .btn + .btn {
+  margin-right: 5px;
+}
+
+
+

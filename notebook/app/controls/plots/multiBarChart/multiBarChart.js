@@ -49,12 +49,12 @@ define(function (require) {
                     $scope.options.chart.xAxis.axisLabel = x || 'X';
                     $scope.options.chart.yAxis.axisLabel = y || 'Y';
 
-                    if(groupBy){
+                    if (groupBy) {
                         $scope.data = d3.nest()
-                            .key(function(d){
+                            .key(function (d) {
                                 return d[groupBy];
                             })
-                            .rollup(function(list){
+                            .rollup(function (list) {
                                 return calculateValues(list, x, y);
                             })
                             .entries($scope.model.data);
@@ -73,7 +73,7 @@ define(function (require) {
                     }
                 };
 
-                function calculateValues(data, x, y){
+                function calculateValues(data, x, y) {
                     var keyGroups = [
                         []
                     ];
@@ -133,5 +133,4 @@ define(function (require) {
             }
         }
     });
-})
-;
+});

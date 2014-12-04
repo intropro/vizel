@@ -19,6 +19,9 @@ define(function (require) {
                             $scope.selectPlugin = function(plugin){
                                 block.plugin = plugin;
                             };
+                            $scope.$watch('block.plugin', function(){
+                                $scope.block.pluginName = $scope.block.plugin ? $scope.block.plugin.name : '';
+                            });
 
                             $scope.close = function () {
                                 $modalInstance.close();

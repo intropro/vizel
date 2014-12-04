@@ -14,7 +14,9 @@ define(function (require) {
                     multiBarChart: 'multiBarChart',
                     lineChart: 'lineChart',
                     pieChart: 'pieChart',
-                    mapChart: 'mapChart'
+                    mapChart: 'mapChart',
+                    percentsChart: 'percentsChart',
+                    bigNumberChart: 'bigNumberChart'
                 };
 
                 $scope.selectType = function (type) {

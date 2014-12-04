@@ -29,6 +29,8 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
+                <li><a href="#/notebook">Notebooks</a></li>
+                <li><a href="#/clusters">Clusters</a></li>
             </ul>
         </div>
     </div>

@@ -19,7 +19,17 @@
 </div>
 
 <div class="" ng-if="block.type === types.mapChart">
-    <div class="presentation-control-container-table" plot-map-chart plot-data="block">
+    <div class="presentation-control-container-chart" plot-map-chart plot-data="block">
+    </div>
+</div>
+
+<div class="" ng-if="block.type === types.percentsChart">
+    <div class="presentation-control-container-chart" plot-percents-chart plot-data="block">
+    </div>
+</div>
+
+<div class="" ng-if="block.type === types.bigNumberChart">
+    <div class="presentation-control-container-chart" plot-big-number-chart plot-data="block">
     </div>
 </div>
 
@@ -30,39 +40,36 @@
             <i class="glyphicon glyphicon-barcode"></i>
         </button>
 
-        <div class="btn-group dropdown-char-type" dropdown>
-            <button type="button" class="btn btn-default"
-                    ng-class="{active: block.type !== types.grid}"
-                    ng-click="selectType(prevType)"
-                    >
-                <i class="" ng-class="{
-                        'glyphicon glyphicon-stats': prevType === types.multiBarChart || block.type === types.multiBarChart,
-                        'glyphicon glyphicon-picture': prevType === types.lineChart || block.type === types.lineChart,
-                        'glyphicon glyphicon-adjust': prevType === types.pieChart || block.type === types.pieChart,
-                        'icon__usa-map_14': prevType === types.mapChart || block.type === types.mapChart,
-                    }"></i>
-            </button>
+        <button class="btn btn-default" ng-class="{active: block.type === types.multiBarChart}"
+                ng-click="selectType(types.multiBarChart)">
+            <i class="glyphicon glyphicon-stats"></i>
+        </button>
 
-            <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>
-                <span class="caret"></span>
-                <span class="sr-only">Split button!</span>
-            </button>
 
-            <ul class="dropdown-menu" role="menu">
-                <li ng-click="selectType(types.multiBarChart)" class="text-center menu-item">
-                    <i class="glyphicon glyphicon-stats"></i>
-                </li>
-                <li ng-click="selectType(types.lineChart)" class="text-center menu-item">
-                    <i class="glyphicon glyphicon-picture"></i>
-                </li>
-                <li ng-click="selectType(types.pieChart)" class="text-center menu-item">
-                    <i class="glyphicon glyphicon-adjust"></i>
-                </li>
-                <li ng-click="selectType(types.mapChart)" class="text-center menu-item">
-                    <i class="icon__usa-map_14"></i>
-                </li>
-            </ul>
-        </div>
+        <button class="btn btn-default" ng-class="{active: block.type === types.lineChart}"
+                ng-click="selectType(types.lineChart)">
+            <i class="glyphicon glyphicon-picture"></i>
+        </button>
+
+        <button class="btn btn-default" ng-class="{active: block.type === types.pieChart}"
+                ng-click="selectType(types.pieChart)">
+            <i class="glyphicon glyphicon-adjust"></i>
+        </button>
+
+        <button class="btn btn-default" ng-class="{active: block.type === types.mapChart}"
+                ng-click="selectType(types.mapChart)">
+            <i class="icon__usa-map_14"></i>
+        </button>
+
+        <button class="btn btn-default" ng-class="{active: block.type === types.percentsChart}"
+                ng-click="selectType(types.percentsChart)">
+            <i class="glyphicon glyphicon-dashboard"></i>
+        </button>
+
+        <button class="btn btn-default" ng-class="{active: block.type === types.bigNumberChart}"
+                ng-click="selectType(types.bigNumberChart)">
+            <i class="glyphicon glyphicon-sound-5-1"></i>
+        </button>
 
         <button class="btn btn-default" ng-hide="block.type == types.grid"
                 ng-click="showPlotOptions(block, plotOptions)">

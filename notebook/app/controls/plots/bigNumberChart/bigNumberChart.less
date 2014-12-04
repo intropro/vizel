@@ -1,0 +1,38 @@
+.big-number-chart {
+  height: 100%;
+  position:relative;
+
+  .plot-label {
+    text-align: center;
+    font-size: 0px;
+    position: absolute;
+  }
+
+  .arrow {
+    display: inline-block;
+    font-weight: bold;
+  }
+
+  .arrow.up{
+    color:green;
+  }
+
+  .arrow.down{
+    color:red;
+  }
+
+  .down .arrow.up,
+  .up .arrow.down {
+    display: none;
+  }
+
+  .value{
+    font-weight:bold;
+  }
+
+  .points,
+  .value {
+    color: rgb(1, 67, 123);
+    display: inline-block;
+  }
+}
