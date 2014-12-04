@@ -96598,8 +96598,8 @@ define('app/controls/plots/percentsChart/percentsChart',['require','d3','jquery'
         }
 
         function calculateVariables() {
-            offsetWidth = $(el.node()).width();
-            offsetHeight = $(el.node()).height();
+            offsetWidth = $(el.node()).width() || 400;
+            offsetHeight = $(el.node()).height() || 400;
             console.log('offsetWidth, offsetHeight:', offsetWidth, offsetHeight);
             width = offsetWidth > offsetHeight ? offsetHeight : offsetWidth;
             height = width;
@@ -96777,8 +96777,8 @@ define('app/controls/plots/bigNumberChart/bigNumberChart',['require','d3','jquer
         }
 
         function calculateVariables() {
-            offsetWidth = $(el.node()).width();
-            offsetHeight = $(el.node()).height();
+            offsetWidth = $(el.node()).width() || 400;
+            offsetHeight = $(el.node()).height() || 400;
             width = offsetWidth > offsetHeight ? offsetHeight : offsetWidth;
             height = width;
             padding = width / 20;

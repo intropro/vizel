@@ -46,8 +46,8 @@ define(function (require) {
         }
 
         function calculateVariables() {
-            offsetWidth = $(el.node()).width();
-            offsetHeight = $(el.node()).height();
+            offsetWidth = $(el.node()).width() || 400;
+            offsetHeight = $(el.node()).height() || 400;
             width = offsetWidth > offsetHeight ? offsetHeight : offsetWidth;
             height = width;
             padding = width / 20;
