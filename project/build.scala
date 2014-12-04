@@ -7,7 +7,7 @@ import AssemblyKeys._
 object build extends Build {
 
   val Settings = Defaults.defaultSettings ++ Seq(
-    version := "0.0.2-SNAPSHOT",
+    version := "0.0.3-SNAPSHOT",
     organization := "com.intropro",
     scalaVersion := "2.11.0",
     crossScalaVersions := Seq("2.10.0", "2.11.0"),
@@ -53,7 +53,9 @@ object build extends Build {
           "io.spray"            %%    "spray-routing"     % "1.3.1",
           "io.spray"            %%    "spray-testkit"     % "1.3.1",
           "io.spray"            %%    "spray-json"        % "1.3.1",
-          "org.json4s"          %%    "json4s-native"     % "3.2.10-INTROPRO",
+          //"org.json4s"          %%    "json4s-native"     % "3.2.12",
+          //"org.json4s"          %    "json4s-native_2.10"     % "3.2.10",
+          "org.json4s"          %% "json4s-native" % "3.2.10-INTROPRO",
           "com.typesafe.akka"   %%    "akka-actor"        % "2.3.0",
           "com.jolbox"          %     "bonecp"            % "0.8.0.RELEASE",
           "com.github.nscala-time" %% "nscala-time"       % "1.4.0"
