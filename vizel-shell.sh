@@ -19,4 +19,4 @@ if [ "$?" == "1" ]; then
     exit 2
 fi
 
-$SCALA_HOME/bin/scala -i $CONF -cp target/scala-2.11/vizel-assembly-0.0.2-SNAPSHOT.jar
+$SCALA_HOME/bin/scala -i $CONF -cp target/scala-2.11/vizel-assembly-0.0.3-SNAPSHOT.jar

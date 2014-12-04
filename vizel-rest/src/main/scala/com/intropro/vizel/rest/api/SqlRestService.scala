@@ -39,6 +39,15 @@ trait SqlRestService extends HttpService with PerRequestCreator with Json4sSuppo
 
   implicit val json4sFormats = DefaultFormats
 
+  // static route to Notebook is for development and quick startup and not "production"
+  val staticRoute = {
+        path("") {
+            getFromResource("notebook/index.html")
+        } ~ {
+            getFromResourceDirectory("notebook")
+        }
+    }
+
   //override val json4sFormats = DefaultFormats.withBigDecimal
   val itemRoute =
       path("query") {
@@ -63,7 +72,7 @@ trait SqlRestService extends HttpService with PerRequestCreator with Json4sSuppo
               complete("")
             }
         }
-      }
+      } ~ staticRoute
 
 
   def handlePerRequest(message: RequestMessage): Route =
