@@ -4,8 +4,8 @@
     'view-mode': !isEditMode
     }">
     <div class="view-edit-buttons-container" style="padding-top: 10px;">
-        <button class="btn btn-success btn-sm" ng-show="isEditMode" ng-click="isEditMode = false;">View</button>
-        <button class="btn btn-primary btn-sm" ng-hide="isEditMode" ng-click="isEditMode = true;">Edit</button>
+        <button class="btn btn-success btn-sm" ng-show="isEditMode" ng-click="setViewMode(true);">View</button>
+        <button class="btn btn-primary btn-sm" ng-hide="isEditMode" ng-click="setViewMode(false);">Edit</button>
     </div>
 
     <div class="block-list">

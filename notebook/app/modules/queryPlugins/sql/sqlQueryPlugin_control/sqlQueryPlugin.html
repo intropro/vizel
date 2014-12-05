@@ -25,6 +25,13 @@
         </div>
     </div>
     <!--result-->
+    <div class="row" ng-if="errorMessage">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                {{errorMessage}}
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             <div presentation-block class="presentation-block" presentation-data="block" ng-if="block.isExecuted"></div>

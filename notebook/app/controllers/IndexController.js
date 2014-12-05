@@ -26,6 +26,9 @@ define(function (require, exports, module) {
                 $scope.$watch('isEditMode', function () {
                     localStorage.setItem('isViewMode', !$scope.isEditMode);
                 });
+                $scope.setViewMode = function(isViewMode){
+                    $scope.isEditMode = !isViewMode;
+                };
                 $scope.notebook = null;
                 $scope.blocks = [];
 

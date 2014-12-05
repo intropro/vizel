@@ -17,6 +17,7 @@ define(function (require) {
         this.pluginName = data.pluginName;
 
         this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+        this.clusterId = data.clusterId;
 
         this.availableSizes = data.availableSizes;
         this.size = data.size || this.availableSizes[0];
@@ -40,7 +41,8 @@ define(function (require) {
             updatePeriod: b.updatePeriod,
             pluginName: b.pluginName,
             queryLanguage: b.queryLanguage,
-            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+//            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+            clusterId: b.cluster ? b.cluster.id : null,
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
@@ -64,6 +66,7 @@ define(function (require) {
             },
             updatePeriod: null,
             cluster: null,
+            clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],
             variables: []

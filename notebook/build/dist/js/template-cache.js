@@ -439,6 +439,20 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <!--result-->\r" +
     "\n" +
+    "    <div class=\"row\" ng-if=\"errorMessage\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div class=\"alert alert-danger\" role=\"alert\">\r" +
+    "\n" +
+    "                {{errorMessage}}\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
     "    <div class=\"row\">\r" +
     "\n" +
     "        <div class=\"col-lg-12\">\r" +
@@ -763,9 +777,9 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <div class=\"view-edit-buttons-container\" style=\"padding-top: 10px;\">\r" +
     "\n" +
-    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"isEditMode = false;\">View</button>\r" +
+    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"setViewMode(true);\">View</button>\r" +
     "\n" +
-    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"isEditMode = true;\">Edit</button>\r" +
+    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"setViewMode(false);\">Edit</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +

@@ -17,6 +17,7 @@ define(function (require) {
                     var updateOnChangeTimeout = null;
 
                     $scope.isExecuting = false;
+                    $scope.errorMessage = null;
                     $scope.codeMirrorOpts = {
                         extraKeys: {
                             'Shift-Enter': function () {
@@ -76,6 +77,7 @@ define(function (require) {
 
                     $scope.request = function () {
                         clearTimeout($scope.updateTimeout);
+                        $scope.errorMessage = null;
                         $scope.updateTimeout = null;
                         if (!$scope.block.query || !$scope.block.cluster) {
                             return;
@@ -94,7 +96,9 @@ define(function (require) {
                                     $scope.request();
                                 }, $scope.block.updatePeriod * 1000);
                             }
-                        }, function () {
+                        }, function (error) {
+                            //handle error
+                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
                             $scope.isExecuting = false;
                         });
                     };

@@ -93112,6 +93112,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     var updateOnChangeTimeout = null;
 
                     $scope.isExecuting = false;
+                    $scope.errorMessage = null;
                     $scope.codeMirrorOpts = {
                         extraKeys: {
                             'Shift-Enter': function () {
@@ -93171,6 +93172,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
 
                     $scope.request = function () {
                         clearTimeout($scope.updateTimeout);
+                        $scope.errorMessage = null;
                         $scope.updateTimeout = null;
                         if (!$scope.block.query || !$scope.block.cluster) {
                             return;
@@ -93189,7 +93191,9 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                                     $scope.request();
                                 }, $scope.block.updatePeriod * 1000);
                             }
-                        }, function () {
+                        }, function (error) {
+                            //handle error
+                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
                             $scope.isExecuting = false;
                         });
                     };
@@ -95286,6 +95290,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
         this.pluginName = data.pluginName;
 
         this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+        this.clusterId = data.clusterId;
 
         this.availableSizes = data.availableSizes;
         this.size = data.size || this.availableSizes[0];
@@ -95309,7 +95314,8 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
             updatePeriod: b.updatePeriod,
             pluginName: b.pluginName,
             queryLanguage: b.queryLanguage,
-            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+//            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
+            clusterId: b.cluster ? b.cluster.id : null,
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
@@ -95333,6 +95339,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
             },
             updatePeriod: null,
             cluster: null,
+            clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],
             variables: []
@@ -95380,6 +95387,9 @@ define('app/controllers/IndexController',['require','exports','module','../model
                 $scope.$watch('isEditMode', function () {
                     localStorage.setItem('isViewMode', !$scope.isEditMode);
                 });
+                $scope.setViewMode = function(isViewMode){
+                    $scope.isEditMode = !isViewMode;
+                };
                 $scope.notebook = null;
                 $scope.blocks = [];
 
@@ -95430,6 +95440,128 @@ define('app/controllers/IndexController',['require','exports','module','../model
 });
 
 ;
+define('app/services/clusterService',['require','angular','../models/cluster','../ngModule'],function (require) {
+    var ng = require('angular');
+    var clusterListLocalStorageItemName = 'savedClusterList';
+    var clusterModel = require('../models/cluster');
+
+    require('../ngModule').service('clusterService', function ($q) {
+        var that = this;
+
+        this.clusterList = [];
+
+        this.getAll = function () {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage().then(function(){
+
+                defer.resolve(this.clusterList);
+
+            }.bind(this), function(){
+                defer.reject();
+            });
+
+            return defer.promise;
+        };
+
+        this.getById = function (id) {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage().then(function () {
+
+                var item = this.clusterList.filter(function (c) {
+                    return c.id === id;
+                })[0];
+                if (item) {
+                    defer.resolve(item);
+                } else {
+                    defer.reject('Not found');
+                }
+
+            }.bind(this), function () {
+                defer.reject();
+            });
+
+            return defer.promise;
+        };
+
+        this.saveOne = function (cluster) {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage().then(function () {
+
+                if (cluster.id !== 0) {
+                    var existedItem = this.clusterList.filter(function (c) {
+                        return c.id === cluster.id;
+                    })[0];
+                    if (existedItem) {
+                        ng.extend(existedItem, cluster);
+                    }
+                } else {
+                    var idArr = [];
+                    this.clusterList.forEach(function (c) {
+                        idArr[c.id] = c;
+                    });
+                    cluster.id = idArr.length || 1;
+                    this.clusterList.unshift(cluster);
+                }
+                _saveAllToLocalStorage();
+                defer.resolve();
+
+            }.bind(this), function () {
+                defer.reject();
+            });
+
+
+            return defer.promise;
+        };
+
+        this.removeById = function (id) {
+            var defer = $q.defer();
+
+            _restoreAllFromLocalStorage().then(function () {
+
+                var item = this.clusterList.filter(function (c) {
+                    return c.id === id;
+                })[0];
+                if (item) {
+                    this.clusterList.splice(this.clusterList.indexOf(item), 1);
+                    _saveAllToLocalStorage();
+                    defer.resolve();
+                } else {
+                    defer.reject('Not found');
+                }
+
+            }.bind(this), function () {
+                defer.reject();
+            });
+
+            return defer.promise;
+        };
+
+        function _restoreAllFromLocalStorage() {
+            var defer = $q.defer();
+
+            var jsonArr = ng.fromJson(localStorage.getItem(clusterListLocalStorageItemName)) || [];
+            var instantiatedClusters = jsonArr.map(function(c){
+                return clusterModel.factory(c);
+            });
+            that.clusterList.length = 0;
+            that.clusterList.push.apply(that.clusterList, instantiatedClusters);
+            defer.resolve(that.clusterList);
+
+            return defer.promise;
+        }
+
+        function _saveAllToLocalStorage() {
+            var jsonString2Save = ng.toJson(that.clusterList.map(function (c) {
+                return clusterModel.toJson(c);
+            }));
+            localStorage.setItem(clusterListLocalStorageItemName, jsonString2Save);
+        }
+    });
+});
+;
 define('app/models/notebook',['require','angular','./notebookBlock'],function (require) {
     var ng = require('angular');
     var notebookBlock = require('./notebookBlock');
@@ -95474,12 +95606,13 @@ define('app/models/notebook',['require','angular','./notebookBlock'],function (r
     };
 });
 ;
-define('app/services/notebookService',['require','angular','../models/notebook','../ngModule'],function (require) {
+define('app/services/notebookService',['require','./clusterService','angular','../models/notebook','../ngModule'],function (require) {
+    require('./clusterService');
     var ng = require('angular');
     var notebookModel = require('../models/notebook');
-    var canvasListLocalStorageItemName = 'savedCanvasList';
+    var canvasListLocalStorageItemName = 'savedNotebookList';
 
-    require('../ngModule').service('notebookService', function ($q, queryPluginsManager) {
+    require('../ngModule').service('notebookService', function ($q, queryPluginsManager, clusterService) {
         var pluginsArr = queryPluginsManager.getAll();
         var plugins = {};
         pluginsArr.forEach(function (p) {
@@ -95489,48 +95622,71 @@ define('app/services/notebookService',['require','angular','../models/notebook',
 
         this.notebookList = [];
 
-        this.getAll = function(){
+        this.getAll = function () {
             var defer = $q.defer();
 
-            _restoreAllFromLocalStorage();
-            defer.resolve(this.notebookList);
+            _restoreAllFromLocalStorage().then(function () {
+
+                defer.resolve(this.notebookList);
+
+            }.bind(this), function () {
+                defer.reject();
+            });
 
             return defer.promise;
         };
 
-        this.getById = function(id){
+        this.getById = function (id) {
             var defer = $q.defer();
 
-            _restoreAllFromLocalStorage();
+            _restoreAllFromLocalStorage().then(function () {
 
-            var item = this.notebookList.filter(function(c){
-               return c.id === id;
-            })[0];
-            if(item){
-                defer.resolve(item);
-            } else {
-                defer.reject('Not found');
-            }
+                var item = this.notebookList.filter(function (c) {
+                    return c.id === id;
+                })[0];
+                if (item) {
+                    if(item.blocks.length > 0){
+                        clusterService.getAll().then(function(clusterList){
+                            var clustersById = [];
+                            clusterList.forEach(function(c){
+                                clustersById[c.id] = c;
+                            });
+                            item.blocks.forEach(function(block){
+                                block.cluster = clustersById[block.clusterId];
+                            });
+                        })['finally'](function(){
+                            defer.resolve(item);
+                        });
+                    } else {
+                        defer.resolve(item);
+                    }
+                } else {
+                    defer.reject('Not found');
+                }
+
+            }.bind(this), function () {
+                defer.reject();
+            });
 
             return defer.promise;
 
         };
 
-        this.saveOne = function(notebook){
+        this.saveOne = function (notebook) {
             var defer = $q.defer();
 
             _restoreAllFromLocalStorage();
 
-            if(notebook.id !== 0){
-                var existedItem = this.notebookList.filter(function(c){
+            if (notebook.id !== 0) {
+                var existedItem = this.notebookList.filter(function (c) {
                     return c.id === notebook.id;
                 })[0];
-                if(existedItem){
+                if (existedItem) {
                     ng.extend(existedItem, notebook);
                 }
             } else {
                 var idArr = [];
-                this.notebookList.forEach(function(c){
+                this.notebookList.forEach(function (c) {
                     idArr[c.id] = c;
                 });
                 notebook.id = idArr.length || 1;
@@ -95544,39 +95700,48 @@ define('app/services/notebookService',['require','angular','../models/notebook',
             return defer.promise;
         };
 
-        this.removeById = function(id){
+        this.removeById = function (id) {
             var defer = $q.defer();
-            _restoreAllFromLocalStorage();
+            _restoreAllFromLocalStorage().then(function () {
 
-            var item = this.notebookList.filter(function(c){
-                return c.id === id;
-            })[0];
-            if(item){
-                this.notebookList.splice(this.notebookList.indexOf(item), 1);
-                _saveAllToLocalStorage();
-                defer.resolve();
-            } else {
-                defer.reject('Not found');
-            }
+                var item = this.notebookList.filter(function (c) {
+                    return c.id === id;
+                })[0];
+                if (item) {
+                    this.notebookList.splice(this.notebookList.indexOf(item), 1);
+                    _saveAllToLocalStorage();
+                    defer.resolve();
+                } else {
+                    defer.reject('Not found');
+                }
+
+            }.bind(this), function () {
+                defer.reject();
+            });
 
             return defer.promise;
         };
 
-        function _restoreAllFromLocalStorage(){
+        function _restoreAllFromLocalStorage() {
+            var defer = $q.defer();
+
             var jsonArr = ng.fromJson(localStorage.getItem(canvasListLocalStorageItemName)) || [];
             that.notebookList.length = 0;
-            var arr = jsonArr.map(function(c){
+            var arr = jsonArr.map(function (c) {
                 var model = notebookModel.factory(c);
-                model.blocks.forEach(function(b){
+                model.blocks.forEach(function (b) {
                     b.plugin = plugins[b.pluginName] || null;
                 });
                 return model;
             });
             that.notebookList.push.apply(that.notebookList, arr);
+            defer.resolve(that.notebookList);
+
+            return defer.promise;
         }
 
-        function _saveAllToLocalStorage(){
-            var arr = that.notebookList.map(function(c){
+        function _saveAllToLocalStorage() {
+            var arr = that.notebookList.map(function (c) {
                 return notebookModel.toJson(c);
             });
             var jsonString2Save = ng.toJson(arr);
@@ -95643,104 +95808,6 @@ define('app/controllers/NotebookListController',['require','../services/notebook
             };
         }
     ]);
-});
-;
-define('app/services/clusterService',['require','angular','../models/cluster','../ngModule'],function (require) {
-    var ng = require('angular');
-    var clusterListLocalStorageItemName = 'savedClusterList';
-    var clusterModel = require('../models/cluster');
-
-    require('../ngModule').service('clusterService', function ($q) {
-        var that = this;
-
-        this.clusterList = [];
-
-        this.getAll = function () {
-            var defer = $q.defer();
-
-            _restoreAllFromLocalStorage();
-            defer.resolve(this.clusterList);
-
-            return defer.promise;
-        };
-
-        this.getById = function (id) {
-            var defer = $q.defer();
-
-            _restoreAllFromLocalStorage();
-
-            var item = this.clusterList.filter(function (c) {
-                return c.id === id;
-            })[0];
-            if (item) {
-                defer.resolve(item);
-            } else {
-                defer.reject('Not found');
-            }
-
-            return defer.promise;
-        };
-
-        this.saveOne = function (cluster) {
-            var defer = $q.defer();
-
-            _restoreAllFromLocalStorage();
-
-            if (cluster.id !== 0) {
-                var existedItem = this.clusterList.filter(function (c) {
-                    return c.id === cluster.id;
-                })[0];
-                if (existedItem) {
-                    ng.extend(existedItem, cluster);
-                }
-            } else {
-                var idArr = [];
-                this.clusterList.forEach(function (c) {
-                    idArr[c.id] = c;
-                });
-                cluster.id = idArr.length || 1;
-                this.clusterList.unshift(cluster);
-            }
-
-            _saveAllToLocalStorage();
-
-            defer.resolve();
-
-            return defer.promise;
-        };
-
-        this.removeById = function (id) {
-            var defer = $q.defer();
-            _restoreAllFromLocalStorage();
-
-            var item = this.clusterList.filter(function (c) {
-                return c.id === id;
-            })[0];
-            if (item) {
-                this.clusterList.splice(this.clusterList.indexOf(item), 1);
-                _saveAllToLocalStorage();
-                defer.resolve();
-            } else {
-                defer.reject('Not found');
-            }
-
-
-            return defer.promise;
-        };
-
-        function _restoreAllFromLocalStorage() {
-            var jsonArr = ng.fromJson(localStorage.getItem(clusterListLocalStorageItemName)) || [];
-            that.clusterList.length = 0;
-            that.clusterList.push.apply(that.clusterList, jsonArr);
-        }
-
-        function _saveAllToLocalStorage() {
-            var jsonString2Save = ng.toJson(that.clusterList.map(function (c) {
-                return clusterModel.toJson(c);
-            }));
-            localStorage.setItem(clusterListLocalStorageItemName, jsonString2Save);
-        }
-    });
 });
 ;
 define('app/controllers/ClusterListController',['require','../services/queryPluginsManager','../services/clusterService','../models/cluster','../ngModule'],function (require) {
@@ -97394,6 +97461,20 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "    <!--result-->\r" +
     "\n" +
+    "    <div class=\"row\" ng-if=\"errorMessage\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <div class=\"alert alert-danger\" role=\"alert\">\r" +
+    "\n" +
+    "                {{errorMessage}}\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
     "    <div class=\"row\">\r" +
     "\n" +
     "        <div class=\"col-lg-12\">\r" +
@@ -97718,9 +97799,9 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "    <div class=\"view-edit-buttons-container\" style=\"padding-top: 10px;\">\r" +
     "\n" +
-    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"isEditMode = false;\">View</button>\r" +
+    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"setViewMode(true);\">View</button>\r" +
     "\n" +
-    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"isEditMode = true;\">Edit</button>\r" +
+    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"setViewMode(false);\">Edit</button>\r" +
     "\n" +
     "    </div>\r" +
     "\n" +
