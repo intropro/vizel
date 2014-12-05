@@ -9,3 +9,8 @@ JDBC
 ScalikeJDBC
 ----
 Requires patched build
+
+Notebook
+--------
+Exploration Workbench
+(Please, README in notebook directory)
