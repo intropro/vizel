@@ -45,12 +45,6 @@ Prerequisites:
 
 Build project using commands:
 
-	$ grunt build:dev
+    $ grunt build:dev
     $ grunt build:dist
     $ grunt build - both :dev and :dist
-   
-Compile css using commands:
-
-    $ grunt less:dev
-    $ grunt less:dist
-    $ grunt less - both :dev and dist
