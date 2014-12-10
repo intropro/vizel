@@ -1,11 +1,11 @@
 ;
 define(function (require) {
-    require('./clusterService');
+    require('./backendService');
     var ng = require('angular');
     var notebookModel = require('../models/notebook');
-    var canvasListLocalStorageItemName = 'savedNotebookList';
+    var notebookListLocalStorageItemName = 'savedNotebookList';
 
-    require('../ngModule').service('notebookService', function ($q, queryPluginsManager, clusterService) {
+    require('../ngModule').service('notebookService', function ($q, queryPluginsManager, backendService) {
         var pluginsArr = queryPluginsManager.getAll();
         var plugins = {};
         pluginsArr.forEach(function (p) {
@@ -39,13 +39,13 @@ define(function (require) {
                 })[0];
                 if (item) {
                     if(item.blocks.length > 0){
-                        clusterService.getAll().then(function(clusterList){
-                            var clustersById = [];
-                            clusterList.forEach(function(c){
-                                clustersById[c.id] = c;
+                        backendService.getAll().then(function(backendList){
+                            var backendsById = [];
+                            backendList.forEach(function(c){
+                                backendsById[c.id] = c;
                             });
                             item.blocks.forEach(function(block){
-                                block.cluster = clustersById[block.clusterId];
+                                block.backend = backendsById[block.clusterId];
                             });
                         })['finally'](function(){
                             defer.resolve(item);
@@ -118,7 +118,7 @@ define(function (require) {
         function _restoreAllFromLocalStorage() {
             var defer = $q.defer();
 
-            var jsonArr = ng.fromJson(localStorage.getItem(canvasListLocalStorageItemName)) || [];
+            var jsonArr = ng.fromJson(localStorage.getItem(notebookListLocalStorageItemName)) || [];
             that.notebookList.length = 0;
             var arr = jsonArr.map(function (c) {
                 var model = notebookModel.factory(c);
@@ -138,7 +138,7 @@ define(function (require) {
                 return notebookModel.toJson(c);
             });
             var jsonString2Save = ng.toJson(arr);
-            localStorage.setItem(canvasListLocalStorageItemName, jsonString2Save);
+            localStorage.setItem(notebookListLocalStorageItemName, jsonString2Save);
         }
     });
 });

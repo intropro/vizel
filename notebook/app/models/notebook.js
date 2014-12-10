@@ -24,7 +24,7 @@ define(function (require) {
     function fromJson(json){
         var data = ng.extend({
             id: 0,
-            name: "[Brand new]",
+            name: "Unnamed notebook",
             blocks: []
         }, json);
 

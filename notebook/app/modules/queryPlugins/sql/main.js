@@ -8,7 +8,7 @@ define(function (require) {
         queryLanguage: 'SQL',
         snippetUrl: '/app/modules/queryPlugins/sql/snippet.html',
         blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html',
-        needCluster: true
+        needBackend: true
     };
 
     return {

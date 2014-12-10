@@ -53,8 +53,6 @@ define(function (require) {
                             return [];
                         });
 
-                        keys.sort(d3.ascending);
-
                         $scope.model.data.forEach(function (d) {
                             keyGroups[keys.indexOf(d[x])].push(d);
                         });

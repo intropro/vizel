@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h3>
-                Saved clusters
+                Saved backends
                 <button class="btn btn-primary btn-sm" type="button" ng-click="createNew()">
                     Create new <i class="glyphicon glyphicon-plus"></i>
                 </button>
@@ -20,16 +20,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="c in list">
-                    <td><a ng-click="editInDialog(c)">{{c.name}}</a></td>
-                    <td>{{c.endPoint}}</td>
-                    <td>{{c.pathToData}}</td>
-                    <td>{{c.pathToError}}</td>
-                    <td>{{c.language}}</td>
+                <tr ng-repeat="b in list">
+                    <td><a ng-click="editInDialog(b)">{{b.name}}</a></td>
+                    <td>{{b.endPoint}}</td>
+                    <td>{{b.pathToData}}</td>
+                    <td>{{b.pathToError}}</td>
+                    <td>{{b.language}}</td>
                     <td>
-                        <button class="btn btn-default" ng-click="editInDialog(c)"><i
+                        <button class="btn btn-default" ng-click="editInDialog(b)"><i
                                 class="glyphicon glyphicon-pencil"></i></button>
-                        <button class="btn btn-danger" ng-click="remove(c)"><i class="glyphicon glyphicon-remove"></i>
+                        <button class="btn btn-danger" ng-click="remove(b)"><i class="glyphicon glyphicon-remove"></i>
                         </button>
                     </td>
                 </tr>

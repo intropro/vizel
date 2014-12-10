@@ -5,7 +5,7 @@ define(function (require) {
     pluginModule.module.service(name, function ($http, $q) {
         this.execute = function (block) {
             var defer = $q.defer();
-            $http.post(block.cluster.endPoint, {
+            $http.post(block.backend.endPoint, {
                 query: block.query
             }).success(function (response) {
                 var result = extractData(block, response);
@@ -23,8 +23,8 @@ define(function (require) {
                 data: [],
                 error: null
             };
-            var pathToData = block.cluster.pathToData;
-            var pathToError = block.cluster.pathToError;
+            var pathToData = block.backend.pathToData;
+            var pathToError = block.backend.pathToError;
             if(!pathToData){
                 result.data = response;
             } else {
@@ -35,7 +35,7 @@ define(function (require) {
                     if(lastLevelData){
                         lastLevelData = lastLevelData[path];
                     } else {
-                        console.error("Server response does not correspond to cluster's description. Cannot retrieve data. Response:", response, " Block:", block);
+                        console.error("Server response does not correspond to backend's description. Cannot retrieve data. Response:", response, " Block:", block);
                     }
                 });
                 result.data = lastLevelData;
@@ -50,7 +50,7 @@ define(function (require) {
                     if(lastLevelError){
                         lastLevelError = lastLevelError[path];
                     } else {
-                        console.error("Server response does not correspond to cluster's description. Cannot retrieve error. Response:", response, " Block:", block);
+                        console.error("Server response does not correspond to backend's description. Cannot retrieve error. Response:", response, " Block:", block);
                     }
                 });
                 result.error = lastLevelError;

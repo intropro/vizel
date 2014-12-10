@@ -79,7 +79,7 @@ define(function (require) {
                         clearTimeout($scope.updateTimeout);
                         $scope.errorMessage = null;
                         $scope.updateTimeout = null;
-                        if (!$scope.block.query || !$scope.block.cluster) {
+                        if (!$scope.block.query || !$scope.block.backend) {
                             return;
                         }
                         $scope.isExecuting = true;

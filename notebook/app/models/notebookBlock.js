@@ -2,7 +2,7 @@
 define(function (require) {
     var ng = require('angular');
     var queryVariable = require('./queryVariable');
-    var clusterModel = require('./cluster');
+    var backendModel = require('./backend');
 
     function NotebookBlock(data) {
         this.in = data.in;
@@ -16,7 +16,7 @@ define(function (require) {
 
         this.pluginName = data.pluginName;
 
-        this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+        this.backend = data.backend ? backendModel.factory(data.backend) : null;
         this.clusterId = data.clusterId;
 
         this.availableSizes = data.availableSizes;
@@ -41,8 +41,7 @@ define(function (require) {
             updatePeriod: b.updatePeriod,
             pluginName: b.pluginName,
             queryLanguage: b.queryLanguage,
-//            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
-            clusterId: b.cluster ? b.cluster.id : null,
+            clusterId: b.backend ? b.backend.id : null,
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
@@ -65,7 +64,7 @@ define(function (require) {
                 availableValues: []
             },
             updatePeriod: null,
-            cluster: null,
+            backend: null,
             clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],

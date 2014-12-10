@@ -5,14 +5,14 @@ define(function (require) {
     var service = require('./service');
     plugin.module.controller(name, [
         '$scope',
-        'clusterService',
+        'backendService',
         service.name,
-        function ($scope, clusterService, service) {
-            $scope.allClusters = [];
-            clusterService.getAll().then(function (clusters) {
-                $scope.allClusters = clusters;
-                if (!$scope.block.cluster) {
-                    $scope.block.cluster = $scope.allClusters[0] || null;
+        function ($scope, backendService, service) {
+            $scope.allBackends = [];
+            backendService.getAll().then(function (backend) {
+                $scope.allBackends = backend;
+                if (!$scope.block.backend) {
+                    $scope.block.backend = $scope.allBackends[0] || null;
                 }
             });
         }

@@ -2233,7 +2233,7 @@ body .CodeMirror {
   margin: 20px 0;
 }
 .edit-notebook_title,
-.edit-cluster_title {
+.edit-backend_title {
   text-align: center;
 }
 .edit-notebook_buttons .btn + .btn,

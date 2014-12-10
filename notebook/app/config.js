@@ -2,7 +2,7 @@ define(function (require) {
     require('./services/queryPluginsManager');
     require('./controllers/IndexController');
     require('./controllers/NotebookListController');
-    require('./controllers/ClusterListController');
+    require('./controllers/BackendListController');
 
     require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
         $routeProvider.when('/notebook', {
@@ -13,9 +13,9 @@ define(function (require) {
             templateUrl: '/app/views/index.html',
             controller: 'IndexController'
         });
-        $routeProvider.when('/clusters', {
-            templateUrl: '/app/views/clusterList.html',
-            controller: 'ClusterListController'
+        $routeProvider.when('/backends', {
+            templateUrl: '/app/views/backendList.html',
+            controller: 'BackendListController'
         });
         $routeProvider.otherwise({
             redirectTo: '/notebook'

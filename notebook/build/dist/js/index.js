@@ -92996,7 +92996,7 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
     pluginModule.module.service(name, function ($http, $q) {
         this.execute = function (block) {
             var defer = $q.defer();
-            $http.post(block.cluster.endPoint, {
+            $http.post(block.backend.endPoint, {
                 query: block.query
             }).success(function (response) {
                 var result = extractData(block, response);
@@ -93014,8 +93014,8 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
                 data: [],
                 error: null
             };
-            var pathToData = block.cluster.pathToData;
-            var pathToError = block.cluster.pathToError;
+            var pathToData = block.backend.pathToData;
+            var pathToError = block.backend.pathToError;
             if(!pathToData){
                 result.data = response;
             } else {
@@ -93026,7 +93026,7 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
                     if(lastLevelData){
                         lastLevelData = lastLevelData[path];
                     } else {
-                        console.error("Server response does not correspond to cluster's description. Cannot retrieve data. Response:", response, " Block:", block);
+                        console.error("Server response does not correspond to backend's description. Cannot retrieve data. Response:", response, " Block:", block);
                     }
                 });
                 result.data = lastLevelData;
@@ -93041,7 +93041,7 @@ define('sqlQueryPluginModule/service',['require','./ngModule'],function (require
                     if(lastLevelError){
                         lastLevelError = lastLevelError[path];
                     } else {
-                        console.error("Server response does not correspond to cluster's description. Cannot retrieve error. Response:", response, " Block:", block);
+                        console.error("Server response does not correspond to backend's description. Cannot retrieve error. Response:", response, " Block:", block);
                     }
                 });
                 result.error = lastLevelError;
@@ -93174,7 +93174,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                         clearTimeout($scope.updateTimeout);
                         $scope.errorMessage = null;
                         $scope.updateTimeout = null;
-                        if (!$scope.block.query || !$scope.block.cluster) {
+                        if (!$scope.block.query || !$scope.block.backend) {
                             return;
                         }
                         $scope.isExecuting = true;
@@ -93265,14 +93265,14 @@ define('sqlQueryPluginModule/controller',['require','./ngModule','./service'],fu
     var service = require('./service');
     plugin.module.controller(name, [
         '$scope',
-        'clusterService',
+        'backendService',
         service.name,
-        function ($scope, clusterService, service) {
-            $scope.allClusters = [];
-            clusterService.getAll().then(function (clusters) {
-                $scope.allClusters = clusters;
-                if (!$scope.block.cluster) {
-                    $scope.block.cluster = $scope.allClusters[0] || null;
+        function ($scope, backendService, service) {
+            $scope.allBackends = [];
+            backendService.getAll().then(function (backend) {
+                $scope.allBackends = backend;
+                if (!$scope.block.backend) {
+                    $scope.block.backend = $scope.allBackends[0] || null;
                 }
             });
         }
@@ -93292,7 +93292,7 @@ define('sqlQueryPluginModule/main',['require','./sqlQueryPlugin_control/sqlQuery
         queryLanguage: 'SQL',
         snippetUrl: '/app/modules/queryPlugins/sql/snippet.html',
         blockOptionsSnippetUrl: '/app/modules/queryPlugins/sql/blockOptions.html',
-        needCluster: true
+        needBackend: true
     };
 
     return {
@@ -95121,7 +95121,7 @@ define('markdownQueryPluginModule/main',['require','./markdownQueryPlugin_contro
         name: 'markdownQueryPlugin',
         queryLanguage: 'markdown',
         snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html',
-        needCluster: false
+        needBackend: false
     };
 
     return {
@@ -95225,9 +95225,9 @@ define('app/models/queryVariable',['require','angular'],function (require) {
     };
 });
 ;
-define('app/models/cluster',['require','angular'],function (require) {
+define('app/models/backend',['require','angular'],function (require) {
     var ng = require('angular');
-    function Cluster(data) {
+    function Backend(data) {
         this.id = data.id;
         this.name = data.name;
         this.endPoint = data.endPoint;
@@ -95253,11 +95253,11 @@ define('app/models/cluster',['require','angular'],function (require) {
             name: 'Unnamed',
             endPoint: '',
             language: '',
-            pathToData: 'path.to.data',
-            pathToError: 'path.to.error'
+            pathToData: 'data',
+            pathToError: 'error'
         }, json);
 
-        return new Cluster(data);
+        return new Backend(data);
     }
 
     function factory(json){
@@ -95272,10 +95272,10 @@ define('app/models/cluster',['require','angular'],function (require) {
     };
 });
 ;
-define('app/models/notebookBlock',['require','angular','./queryVariable','./cluster'],function (require) {
+define('app/models/notebookBlock',['require','angular','./queryVariable','./backend'],function (require) {
     var ng = require('angular');
     var queryVariable = require('./queryVariable');
-    var clusterModel = require('./cluster');
+    var backendModel = require('./backend');
 
     function NotebookBlock(data) {
         this.in = data.in;
@@ -95289,7 +95289,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
 
         this.pluginName = data.pluginName;
 
-        this.cluster = data.cluster ? clusterModel.factory(data.cluster) : null;
+        this.backend = data.backend ? backendModel.factory(data.backend) : null;
         this.clusterId = data.clusterId;
 
         this.availableSizes = data.availableSizes;
@@ -95314,8 +95314,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
             updatePeriod: b.updatePeriod,
             pluginName: b.pluginName,
             queryLanguage: b.queryLanguage,
-//            cluster: b.cluster ? clusterModel.toJson(b.cluster) : null,
-            clusterId: b.cluster ? b.cluster.id : null,
+            clusterId: b.backend ? b.backend.id : null,
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
@@ -95338,7 +95337,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./clus
                 availableValues: []
             },
             updatePeriod: null,
-            cluster: null,
+            backend: null,
             clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],
@@ -95440,22 +95439,22 @@ define('app/controllers/IndexController',['require','exports','module','../model
 });
 
 ;
-define('app/services/clusterService',['require','angular','../models/cluster','../ngModule'],function (require) {
+define('app/services/backendService',['require','angular','../models/backend','../ngModule'],function (require) {
     var ng = require('angular');
-    var clusterListLocalStorageItemName = 'savedClusterList';
-    var clusterModel = require('../models/cluster');
+    var backendListLocalStorageItemName = 'savedClusterList';
+    var backendModel = require('../models/backend');
 
-    require('../ngModule').service('clusterService', function ($q) {
+    require('../ngModule').service('backendService', function ($q) {
         var that = this;
 
-        this.clusterList = [];
+        this.backendList = [];
 
         this.getAll = function () {
             var defer = $q.defer();
 
             _restoreAllFromLocalStorage().then(function(){
 
-                defer.resolve(this.clusterList);
+                defer.resolve(this.backendList);
 
             }.bind(this), function(){
                 defer.reject();
@@ -95469,7 +95468,7 @@ define('app/services/clusterService',['require','angular','../models/cluster','.
 
             _restoreAllFromLocalStorage().then(function () {
 
-                var item = this.clusterList.filter(function (c) {
+                var item = this.backendList.filter(function (c) {
                     return c.id === id;
                 })[0];
                 if (item) {
@@ -95485,25 +95484,25 @@ define('app/services/clusterService',['require','angular','../models/cluster','.
             return defer.promise;
         };
 
-        this.saveOne = function (cluster) {
+        this.saveOne = function (backend) {
             var defer = $q.defer();
 
             _restoreAllFromLocalStorage().then(function () {
 
-                if (cluster.id !== 0) {
-                    var existedItem = this.clusterList.filter(function (c) {
-                        return c.id === cluster.id;
+                if (backend.id !== 0) {
+                    var existedItem = this.backendList.filter(function (c) {
+                        return c.id === backend.id;
                     })[0];
                     if (existedItem) {
-                        ng.extend(existedItem, cluster);
+                        ng.extend(existedItem, backend);
                     }
                 } else {
                     var idArr = [];
-                    this.clusterList.forEach(function (c) {
+                    this.backendList.forEach(function (c) {
                         idArr[c.id] = c;
                     });
-                    cluster.id = idArr.length || 1;
-                    this.clusterList.unshift(cluster);
+                    backend.id = idArr.length || 1;
+                    this.backendList.unshift(backend);
                 }
                 _saveAllToLocalStorage();
                 defer.resolve();
@@ -95521,11 +95520,11 @@ define('app/services/clusterService',['require','angular','../models/cluster','.
 
             _restoreAllFromLocalStorage().then(function () {
 
-                var item = this.clusterList.filter(function (c) {
+                var item = this.backendList.filter(function (c) {
                     return c.id === id;
                 })[0];
                 if (item) {
-                    this.clusterList.splice(this.clusterList.indexOf(item), 1);
+                    this.backendList.splice(this.backendList.indexOf(item), 1);
                     _saveAllToLocalStorage();
                     defer.resolve();
                 } else {
@@ -95542,22 +95541,22 @@ define('app/services/clusterService',['require','angular','../models/cluster','.
         function _restoreAllFromLocalStorage() {
             var defer = $q.defer();
 
-            var jsonArr = ng.fromJson(localStorage.getItem(clusterListLocalStorageItemName)) || [];
-            var instantiatedClusters = jsonArr.map(function(c){
-                return clusterModel.factory(c);
+            var jsonArr = ng.fromJson(localStorage.getItem(backendListLocalStorageItemName)) || [];
+            var instantiatedBackends = jsonArr.map(function(c){
+                return backendModel.factory(c);
             });
-            that.clusterList.length = 0;
-            that.clusterList.push.apply(that.clusterList, instantiatedClusters);
-            defer.resolve(that.clusterList);
+            that.backendList.length = 0;
+            that.backendList.push.apply(that.backendList, instantiatedBackends);
+            defer.resolve(that.backendList);
 
             return defer.promise;
         }
 
         function _saveAllToLocalStorage() {
-            var jsonString2Save = ng.toJson(that.clusterList.map(function (c) {
-                return clusterModel.toJson(c);
+            var jsonString2Save = ng.toJson(that.backendList.map(function (c) {
+                return backendModel.toJson(c);
             }));
-            localStorage.setItem(clusterListLocalStorageItemName, jsonString2Save);
+            localStorage.setItem(backendListLocalStorageItemName, jsonString2Save);
         }
     });
 });
@@ -95587,7 +95586,7 @@ define('app/models/notebook',['require','angular','./notebookBlock'],function (r
     function fromJson(json){
         var data = ng.extend({
             id: 0,
-            name: "[Brand new]",
+            name: "Unnamed notebook",
             blocks: []
         }, json);
 
@@ -95606,13 +95605,13 @@ define('app/models/notebook',['require','angular','./notebookBlock'],function (r
     };
 });
 ;
-define('app/services/notebookService',['require','./clusterService','angular','../models/notebook','../ngModule'],function (require) {
-    require('./clusterService');
+define('app/services/notebookService',['require','./backendService','angular','../models/notebook','../ngModule'],function (require) {
+    require('./backendService');
     var ng = require('angular');
     var notebookModel = require('../models/notebook');
-    var canvasListLocalStorageItemName = 'savedNotebookList';
+    var notebookListLocalStorageItemName = 'savedNotebookList';
 
-    require('../ngModule').service('notebookService', function ($q, queryPluginsManager, clusterService) {
+    require('../ngModule').service('notebookService', function ($q, queryPluginsManager, backendService) {
         var pluginsArr = queryPluginsManager.getAll();
         var plugins = {};
         pluginsArr.forEach(function (p) {
@@ -95646,13 +95645,13 @@ define('app/services/notebookService',['require','./clusterService','angular','.
                 })[0];
                 if (item) {
                     if(item.blocks.length > 0){
-                        clusterService.getAll().then(function(clusterList){
-                            var clustersById = [];
-                            clusterList.forEach(function(c){
-                                clustersById[c.id] = c;
+                        backendService.getAll().then(function(backendList){
+                            var backendsById = [];
+                            backendList.forEach(function(c){
+                                backendsById[c.id] = c;
                             });
                             item.blocks.forEach(function(block){
-                                block.cluster = clustersById[block.clusterId];
+                                block.backend = backendsById[block.clusterId];
                             });
                         })['finally'](function(){
                             defer.resolve(item);
@@ -95725,7 +95724,7 @@ define('app/services/notebookService',['require','./clusterService','angular','.
         function _restoreAllFromLocalStorage() {
             var defer = $q.defer();
 
-            var jsonArr = ng.fromJson(localStorage.getItem(canvasListLocalStorageItemName)) || [];
+            var jsonArr = ng.fromJson(localStorage.getItem(notebookListLocalStorageItemName)) || [];
             that.notebookList.length = 0;
             var arr = jsonArr.map(function (c) {
                 var model = notebookModel.factory(c);
@@ -95745,7 +95744,7 @@ define('app/services/notebookService',['require','./clusterService','angular','.
                 return notebookModel.toJson(c);
             });
             var jsonString2Save = ng.toJson(arr);
-            localStorage.setItem(canvasListLocalStorageItemName, jsonString2Save);
+            localStorage.setItem(notebookListLocalStorageItemName, jsonString2Save);
         }
     });
 });
@@ -95810,36 +95809,36 @@ define('app/controllers/NotebookListController',['require','../services/notebook
     ]);
 });
 ;
-define('app/controllers/ClusterListController',['require','../services/queryPluginsManager','../services/clusterService','../models/cluster','../ngModule'],function (require) {
+define('app/controllers/BackendListController',['require','../services/queryPluginsManager','../services/backendService','../models/backend','../ngModule'],function (require) {
     require('../services/queryPluginsManager');
-    require('../services/clusterService');
-    var clusterModel = require('../models/cluster');
-    require('../ngModule').controller('ClusterListController', function ($scope, clusterService, queryPluginsManager, $modal) {
+    require('../services/backendService');
+    var backendModel = require('../models/backend');
+    require('../ngModule').controller('BackendListController', function ($scope, backendService, queryPluginsManager, $modal) {
         $scope.list = [];
 
         $scope.createNew = function(){
-            var newCluster = clusterModel.factory({
+            var newBackend = backendModel.factory({
                 endPoint:'http://localhost:9090/query'
             });
-            $scope.editInDialog(newCluster);
+            $scope.editInDialog(newBackend);
         };
 
-        $scope.remove = function(cluster){
-            var decision = confirm('Are you sure you want to remove the cluster ' + cluster.name + '?');
+        $scope.remove = function(backend){
+            var decision = confirm('Are you sure you want to remove the backend ' + backend.name + '?');
             if(decision){
-                clusterService.removeById(cluster.id);
+                backendService.removeById(backend.id);
             }
         };
 
-        $scope.editInDialog = function (cluster) {
+        $scope.editInDialog = function (backend) {
             $modal.open({
-                templateUrl: '/app/views/editCluster.html',
-                controller: function ($scope, $modalInstance, cluster, plugins) {
-                    $scope.cluster = cluster;
+                templateUrl: '/app/views/editBackend.html',
+                controller: function ($scope, $modalInstance, backend, plugins) {
+                    $scope.backend = backend;
                     $scope.plugins = plugins;
 
-                    if(!cluster.language && plugins.length > 0){
-                        cluster.language = plugins[0].queryLanguage;
+                    if(!backend.language && plugins.length > 0){
+                        backend.language = plugins[0].queryLanguage;
                     }
 
                     $scope.close = function () {
@@ -95847,7 +95846,7 @@ define('app/controllers/ClusterListController',['require','../services/queryPlug
                     };
 
                     $scope.save = function () {
-                        clusterService.saveOne($scope.cluster);
+                        backendService.saveOne($scope.backend);
                         $modalInstance.close();
                     };
                 },
@@ -95855,27 +95854,27 @@ define('app/controllers/ClusterListController',['require','../services/queryPlug
                 resolve: {
                     plugins: function(){
                         var plugins = queryPluginsManager.getAll().filter(function(p){
-                            return p.needCluster === true;
+                            return p.needBackend === true;
                         });
                         return plugins;
                     },
-                    cluster: function () {
-                        return cluster;
+                    backend: function () {
+                        return backend;
                     }
                 }
             });
         };
 
-        clusterService.getAll().then(function (clusters) {
-            $scope.list = clusters;
+        backendService.getAll().then(function (backend) {
+            $scope.list = backend;
         });
     });
 });
-define('app/config',['require','./services/queryPluginsManager','./controllers/IndexController','./controllers/NotebookListController','./controllers/ClusterListController','./ngModule','sqlQueryPluginModule','markdownQueryPluginModule'],function (require) {
+define('app/config',['require','./services/queryPluginsManager','./controllers/IndexController','./controllers/NotebookListController','./controllers/BackendListController','./ngModule','sqlQueryPluginModule','markdownQueryPluginModule'],function (require) {
     require('./services/queryPluginsManager');
     require('./controllers/IndexController');
     require('./controllers/NotebookListController');
-    require('./controllers/ClusterListController');
+    require('./controllers/BackendListController');
 
     require('./ngModule').config(['$routeProvider', '$locationProvider', 'queryPluginsManagerProvider', function ($routeProvider, $locationProvider, queryPluginsManagerProvider) {
         $routeProvider.when('/notebook', {
@@ -95886,9 +95885,9 @@ define('app/config',['require','./services/queryPluginsManager','./controllers/I
             templateUrl: '/app/views/index.html',
             controller: 'IndexController'
         });
-        $routeProvider.when('/clusters', {
-            templateUrl: '/app/views/clusterList.html',
-            controller: 'ClusterListController'
+        $routeProvider.when('/backends', {
+            templateUrl: '/app/views/backendList.html',
+            controller: 'BackendListController'
         });
         $routeProvider.otherwise({
             redirectTo: '/notebook'
@@ -96162,8 +96161,6 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                             return [];
                         });
 
-                        keys.sort(d3.ascending);
-
                         data.forEach(function (d) {
                             keyGroups[keys.indexOf(d[x])].push(d);
                         });
@@ -96298,8 +96295,6 @@ define('app/controls/plots/lineChart/lineChart',['require','d3','jquery','../../
                             return [];
                         });
 
-                        keys.sort(d3.ascending);
-
                         data.forEach(function (d) {
                             keyGroups[keys.indexOf(d[x])].push(d);
                         });
@@ -96391,8 +96386,6 @@ define('app/controls/plots/pieChart/pieChart',['require','d3','jquery','../../..
                         keyGroups = keys.map(function (d) {
                             return [];
                         });
-
-                        keys.sort(d3.ascending);
 
                         $scope.model.data.forEach(function (d) {
                             keyGroups[keys.indexOf(d[x])].push(d);
@@ -97368,19 +97361,19 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
   $templateCache.put('/app/modules/queryPlugins/sql/blockOptions.html',
     "<div class=\"form-group\">\r" +
     "\n" +
-    "    <label class=\"block-options-label\">Cluster:</label>\r" +
+    "    <label class=\"block-options-label\">Backend:</label>\r" +
     "\n" +
     "    <div class=\"btn-group\" dropdown>\r" +
     "\n" +
-    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.cluster.name || '- choose cluster -'}}<span class=\"caret\"></span>\r" +
+    "        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>{{block.backend.name || '- choose backend -'}}<span class=\"caret\"></span>\r" +
     "\n" +
     "        </button>\r" +
     "\n" +
     "        <ul class=\"dropdown-menu\" role=\"menu\" ng-controller=\"controller_sql_QueryPlugin\">\r" +
     "\n" +
-    "            <li ng-repeat=\"cl in allClusters | filter:{language: block.plugin.queryLanguage}:true\">\r" +
+    "            <li ng-repeat=\"cl in allBackends | filter:{language: block.plugin.queryLanguage}:true\">\r" +
     "\n" +
-    "                <a ng-click=\"block.cluster = cl\">{{cl.name}}</a>\r" +
+    "                <a ng-click=\"block.backend = cl\">{{cl.name}}</a>\r" +
     "\n" +
     "            </li>\r" +
     "\n" +
@@ -97489,6 +97482,92 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
   );
 
 
+  $templateCache.put('/app/views/backendList.html',
+    "<div class=\"container-fluid\">\r" +
+    "\n" +
+    "    <div class=\"row\">\r" +
+    "\n" +
+    "        <div class=\"col-lg-12\">\r" +
+    "\n" +
+    "            <h3>\r" +
+    "\n" +
+    "                Saved backends\r" +
+    "\n" +
+    "                <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
+    "\n" +
+    "                    Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
+    "\n" +
+    "                </button>\r" +
+    "\n" +
+    "            </h3>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "            <table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
+    "\n" +
+    "                <thead>\r" +
+    "\n" +
+    "                <tr>\r" +
+    "\n" +
+    "                    <th>Name</th>\r" +
+    "\n" +
+    "                    <th>End point</th>\r" +
+    "\n" +
+    "                    <th>Path to data</th>\r" +
+    "\n" +
+    "                    <th>Path to error</th>\r" +
+    "\n" +
+    "                    <th>Language</th>\r" +
+    "\n" +
+    "                    <th></th>\r" +
+    "\n" +
+    "                </tr>\r" +
+    "\n" +
+    "                </thead>\r" +
+    "\n" +
+    "                <tbody>\r" +
+    "\n" +
+    "                <tr ng-repeat=\"b in list\">\r" +
+    "\n" +
+    "                    <td><a ng-click=\"editInDialog(b)\">{{b.name}}</a></td>\r" +
+    "\n" +
+    "                    <td>{{b.endPoint}}</td>\r" +
+    "\n" +
+    "                    <td>{{b.pathToData}}</td>\r" +
+    "\n" +
+    "                    <td>{{b.pathToError}}</td>\r" +
+    "\n" +
+    "                    <td>{{b.language}}</td>\r" +
+    "\n" +
+    "                    <td>\r" +
+    "\n" +
+    "                        <button class=\"btn btn-default\" ng-click=\"editInDialog(b)\"><i\r" +
+    "\n" +
+    "                                class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
+    "\n" +
+    "                        <button class=\"btn btn-danger\" ng-click=\"remove(b)\"><i class=\"glyphicon glyphicon-remove\"></i>\r" +
+    "\n" +
+    "                        </button>\r" +
+    "\n" +
+    "                    </td>\r" +
+    "\n" +
+    "                </tr>\r" +
+    "\n" +
+    "                </tbody>\r" +
+    "\n" +
+    "            </table>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "        </div>\r" +
+    "\n" +
+    "    </div>\r" +
+    "\n" +
+    "</div>\r" +
+    "\n"
+  );
+
+
   $templateCache.put('/app/views/blockOptions.html',
     "<h2 class=\"text-center\">Block options</h2>\r" +
     "\n" +
@@ -97542,93 +97621,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
   );
 
 
-  $templateCache.put('/app/views/clusterList.html',
-    "<div class=\"container-fluid\">\r" +
-    "\n" +
-    "    <div class=\"row\">\r" +
-    "\n" +
-    "        <div class=\"col-lg-12\">\r" +
-    "\n" +
-    "            <h3>\r" +
-    "\n" +
-    "                Saved clusters\r" +
-    "\n" +
-    "                <button class=\"btn btn-primary btn-sm\" type=\"button\" ng-click=\"createNew()\">\r" +
-    "\n" +
-    "                    Create new <i class=\"glyphicon glyphicon-plus\"></i>\r" +
-    "\n" +
-    "                </button>\r" +
-    "\n" +
-    "            </h3>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "            <table class=\"table\" style=\"border:1px solid #ddd;\">\r" +
-    "\n" +
-    "                <thead>\r" +
-    "\n" +
-    "                <tr>\r" +
-    "\n" +
-    "                    <th>Name</th>\r" +
-    "\n" +
-    "                    <th>End point</th>\r" +
-    "\n" +
-    "                    <th>Path to data</th>\r" +
-    "\n" +
-    "                    <th>Path to error</th>\r" +
-    "\n" +
-    "                    <th>Language</th>\r" +
-    "\n" +
-    "                    <th></th>\r" +
-    "\n" +
-    "                </tr>\r" +
-    "\n" +
-    "                </thead>\r" +
-    "\n" +
-    "                <tbody>\r" +
-    "\n" +
-    "                <tr ng-repeat=\"c in list\">\r" +
-    "\n" +
-    "                    <td><a ng-click=\"editInDialog(c)\">{{c.name}}</a></td>\r" +
-    "\n" +
-    "                    <td>{{c.endPoint}}</td>\r" +
-    "\n" +
-    "                    <td>{{c.pathToData}}</td>\r" +
-    "\n" +
-    "                    <td>{{c.pathToError}}</td>\r" +
-    "\n" +
-    "                    <td>{{c.language}}</td>\r" +
-    "\n" +
-    "                    <td>\r" +
-    "\n" +
-    "                        <button class=\"btn btn-default\" ng-click=\"editInDialog(c)\"><i\r" +
-    "\n" +
-    "                                class=\"glyphicon glyphicon-pencil\"></i></button>\r" +
-    "\n" +
-    "                        <button class=\"btn btn-danger\" ng-click=\"remove(c)\"><i class=\"glyphicon glyphicon-remove\"></i>\r" +
-    "\n" +
-    "                        </button>\r" +
-    "\n" +
-    "                    </td>\r" +
-    "\n" +
-    "                </tr>\r" +
-    "\n" +
-    "                </tbody>\r" +
-    "\n" +
-    "            </table>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "        </div>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "</div>\r" +
-    "\n"
-  );
-
-
-  $templateCache.put('/app/views/editCluster.html',
+  $templateCache.put('/app/views/editBackend.html',
     "<div class=\"container-fluid\">\r" +
     "\n" +
     "    <div class=\"row\">\r" +
@@ -97637,21 +97630,21 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "\r" +
     "\n" +
-    "            <div class=\"edit-cluster_title\">\r" +
+    "            <div class=\"edit-backend_title\">\r" +
     "\n" +
-    "                <h2>Edit cluster</h2>\r" +
+    "                <h2>Edit backend</h2>\r" +
     "\n" +
     "            </div>\r" +
     "\n" +
     "\r" +
     "\n" +
-    "            <div class=\"edit-cluster_content\">\r" +
+    "            <div class=\"edit-backend_content\">\r" +
     "\n" +
     "                <div class=\"form-group\">\r" +
     "\n" +
     "                    <label class=\"\">Name:</label>\r" +
     "\n" +
-    "                    <input type=\"text\" ng-model=\"cluster.name\" class=\"form-control\"/>\r" +
+    "                    <input type=\"text\" ng-model=\"backend.name\" class=\"form-control\"/>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
@@ -97659,7 +97652,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                    <label class=\"\">End point:</label>\r" +
     "\n" +
-    "                    <input type=\"text\" ng-model=\"cluster.endPoint\" class=\"form-control\"/>\r" +
+    "                    <input type=\"text\" ng-model=\"backend.endPoint\" class=\"form-control\"/>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
@@ -97667,7 +97660,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                    <label class=\"\">Path to data:</label>\r" +
     "\n" +
-    "                    <input type=\"text\" ng-model=\"cluster.pathToData\" class=\"form-control\"/>\r" +
+    "                    <input type=\"text\" ng-model=\"backend.pathToData\" class=\"form-control\"/>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
@@ -97675,7 +97668,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                    <label class=\"\">Path to error:</label>\r" +
     "\n" +
-    "                    <input type=\"text\" ng-model=\"cluster.pathToError\" class=\"form-control\"/>\r" +
+    "                    <input type=\"text\" ng-model=\"backend.pathToError\" class=\"form-control\"/>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
@@ -97689,7 +97682,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                        <button type=\"button\" class=\"btn btn-default dropdown-toggle\" dropdown-toggle>\r" +
     "\n" +
-    "                            {{cluster.language || '- choose language -'}}<span class=\"caret\"></span>\r" +
+    "                            {{backend.language || '- choose language -'}}<span class=\"caret\"></span>\r" +
     "\n" +
     "                        </button>\r" +
     "\n" +
@@ -97697,7 +97690,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                            <li ng-repeat=\"p in plugins\">\r" +
     "\n" +
-    "                                <a ng-click=\"cluster.language = p.queryLanguage\">{{p.queryLanguage}}</a>\r" +
+    "                                <a ng-click=\"backend.language = p.queryLanguage\">{{p.queryLanguage}}</a>\r" +
     "\n" +
     "                            </li>\r" +
     "\n" +

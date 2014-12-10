@@ -1,7 +1,7 @@
 ;
 define(function (require) {
     var ng = require('angular');
-    function Cluster(data) {
+    function Backend(data) {
         this.id = data.id;
         this.name = data.name;
         this.endPoint = data.endPoint;
@@ -27,11 +27,11 @@ define(function (require) {
             name: 'Unnamed',
             endPoint: '',
             language: '',
-            pathToData: 'path.to.data',
-            pathToError: 'path.to.error'
+            pathToData: 'data',
+            pathToError: 'error'
         }, json);
 
-        return new Cluster(data);
+        return new Backend(data);
     }
 
     function factory(json){

@@ -6,7 +6,7 @@ define(function (require) {
         name: 'markdownQueryPlugin',
         queryLanguage: 'markdown',
         snippetUrl: '/app/modules/queryPlugins/markdown/snippet.html',
-        needCluster: false
+        needBackend: false
     };
 
     return {
