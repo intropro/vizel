@@ -169,6 +169,14 @@ define(function (require) {
                         if($scope.block.options.availableValues.indexOf($scope.block.options.va) == -1){
                             $scope.block.options.value = ($scope.block.options.availableValues[1] || $scope.block.options.availableValues[0]) || null;
                         }
+
+                        if($scope.block.options.types.indexOf($scope.block.options.keyType) == -1){
+                            $scope.block.options.keyType = $scope.block.options.types[0];
+                        }
+
+                        if($scope.block.options.types.indexOf($scope.block.options.valueType) == -1){
+                            $scope.block.options.valueType = $scope.block.options.types[0];
+                        }
                     }
                 }
             }

@@ -2117,9 +2117,24 @@ body .CodeMirror {
 }
 .plot-bar-chart {
   height: 100%;
+  position: relative;
 }
 .plot-bar-chart__bar {
   fill: #1f77b4;
+}
+.plot-bar-chart__bar:hover {
+  fill: #2495e0;
+  opacity: .9;
+}
+.plot-bar-chart__tooltip {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ddd;
+  z-index: 999;
+  display: none;
+}
+.plot-bar-chart__tooltip .plot-bar-chart__tooltip_content {
+  padding: 10px;
 }
 .plot-line-chart {
   height: 100%;
@@ -2211,6 +2226,7 @@ body .CodeMirror {
 }
 .block-list {
   margin-bottom: 10px;
+  margin-top: 15px;
 }
 .block-list:before,
 .block-list:after {

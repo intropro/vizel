@@ -1,7 +1,24 @@
 .plot-bar-chart{
   height: 100%;
+  position:relative;
 }
 
 .plot-bar-chart__bar {
   fill: #1f77b4;
+  &:hover {
+    fill: #2495e0;
+    opacity: .9;
+  }
+}
+
+.plot-bar-chart__tooltip {
+  position:absolute;
+  background: #fff;
+  border:1px solid #ddd;
+  z-index: 999;
+  display: none;
+
+  .plot-bar-chart__tooltip_content{
+    padding: 10px;
+  }
 }

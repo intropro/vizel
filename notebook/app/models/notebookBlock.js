@@ -35,7 +35,10 @@ define(function (require) {
                 key: b.options.key,
                 value: b.options.value,
                 availableKeys: b.options.availableKeys,
-                availableValues: b.options.availableValues
+                availableValues: b.options.availableValues,
+                keyType: b.options.keyType,
+                valueType: b.options.valueType,
+                types: b.options.types
             },
             isExecuted: b.isExecuted,
             updatePeriod: b.updatePeriod,
@@ -61,7 +64,10 @@ define(function (require) {
                 key: null,
                 value: null,
                 availableKeys: [],
-                availableValues: []
+                availableValues: [],
+                keyType: null,
+                valueType: null,
+                types: ['number', 'string', 'datetime']
             },
             updatePeriod: null,
             backend: null,

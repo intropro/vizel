@@ -51,7 +51,8 @@ define(function (require) {
                     var min = d3.min($scope.model.data, function (d) {
                         return d[y];
                     });
-                    var color = d3.scale.linear().domain([min, max]).range(["#E0E0FF", "#0000ff"]);
+                    var colorRange = ["#B0D5E8", "#03537C"];
+                    var color = d3.scale.linear().domain([min, max]).range(colorRange);
                     $scope.map.data[0].values = $scope.model.data.map(function(d){
                         return {
                             location: d[x],
@@ -64,8 +65,8 @@ define(function (require) {
                     var fills = {
                         "defaultFill": '#b9b9b9'
                     };
-                    fills[min] = '#E0E0FF';
-                    fills[max] = '#0000ff';
+                    fills[min] = colorRange[0];
+                    fills[max] = colorRange[1];
                     $scope.map.options.fills = fills;
                 };
 

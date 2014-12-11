@@ -144,7 +144,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "<div ng-if=\"block.type === types.multiBarChart\" class=\" presentation-control-container-chart\" plot-multi-bar-chart\r" +
+    "<div ng-if=\"block.type === types.multiBarChart\" class=\" presentation-control-container-chart\" plot-bar-chart\r" +
     "\n" +
     "     plot-data=\"block\">\r" +
     "\n" +
@@ -903,11 +903,13 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "    <div class=\"row\">\r" +
     "\n" +
-    "        <div class=\"col-lg-2 col-md-12\">\r" +
+    "        <div class=\"col-lg-3 col-md-12\">\r" +
     "\n" +
-    "            <div>\r" +
+    "            <div class=\"row\">\r" +
     "\n" +
-    "                <label>Key:\r" +
+    "                <div class=\"col-lg-12 col-md-4 col-sm-4\" style=\"margin-bottom:10px;\">\r" +
+    "\n" +
+    "                    <div>Key:</div>\r" +
     "\n" +
     "                    <select ng-model=\"block.options.key\" ng-options=\"value for value in block.options.availableKeys\">\r" +
     "\n" +
@@ -915,13 +917,15 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                    </select>\r" +
     "\n" +
-    "                </label>\r" +
+    "                    <div>Key type:</div>\r" +
     "\n" +
-    "            </div>\r" +
+    "                    <select ng-model=\"block.options.keyType\" ng-options=\"t for t in block.options.types\"></select>\r" +
     "\n" +
-    "            <div>\r" +
+    "                </div>\r" +
     "\n" +
-    "                <label>Value:\r" +
+    "                <div class=\"col-lg-12 col-md-4 col-sm-4\" style=\"margin-bottom:10px;\">\r" +
+    "\n" +
+    "                    <div>Value:</div>\r" +
     "\n" +
     "                    <select ng-model=\"block.options.value\"\r" +
     "\n" +
@@ -931,35 +935,35 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                    </select>\r" +
     "\n" +
-    "                </label>\r" +
+    "                    <div>Value type:</div>\r" +
     "\n" +
-    "            </div>\r" +
+    "                    <select ng-model=\"block.options.valueType\" ng-options=\"t for t in block.options.types\"></select>\r" +
     "\n" +
-    "            <div>\r" +
+    "                </div>\r" +
     "\n" +
-    "                <label>Group by:\r" +
+    "                <div class=\"col-lg-12 col-md-4 col-sm-4\" style=\"margin-bottom:10px;\">\r" +
+    "\n" +
+    "                    <div>Group by:</div>\r" +
     "\n" +
     "                    <select ng-model=\"block.options.groupBy\"\r" +
     "\n" +
-    "                            ng-options=\"value for value in block.options.availableValues\">\r" +
+    "                            ng-options=\"value for value in block.options.types\">\r" +
     "\n" +
     "                        <option value=\"\">[none]</option>\r" +
     "\n" +
     "                    </select>\r" +
     "\n" +
-    "                </label>\r" +
+    "                </div>\r" +
     "\n" +
     "            </div>\r" +
     "\n" +
-    "\r" +
-    "\n" +
     "        </div>\r" +
     "\n" +
-    "        <div class=\"col-lg-10 col-md-12\">\r" +
+    "        <div class=\"col-lg-9 col-md-12\">\r" +
     "\n" +
     "            <div class=\"row\" ng-if=\"block.type === types.multiBarChart\">\r" +
     "\n" +
-    "                <div class=\"col-lg-12 presentation-control-container-chart\" plot-multi-bar-chart plot-data=\"block\">\r" +
+    "                <div class=\"col-lg-12 presentation-control-container-chart\" plot-bar-chart plot-data=\"block\">\r" +
     "\n" +
     "                </div>\r" +
     "\n" +

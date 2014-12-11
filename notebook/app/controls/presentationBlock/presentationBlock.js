@@ -11,7 +11,7 @@ define(function (require) {
             controller: ['$scope', '$modal', function ($scope, $modal) {
                 $scope.types = {
                     grid: 'grid',
-                    multiBarChart: 'multiBarChart',
+                    multiBarChart: 'plotBarChart',
                     lineChart: 'lineChart',
                     pieChart: 'pieChart',
                     mapChart: 'mapChart',

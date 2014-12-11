@@ -3,7 +3,7 @@ define(function (require) {
     var ng = require('angular');
     var notebookBlock = require('./notebookBlock');
 
-    function Canvas(data) {
+    function Notebook(data) {
         this.id = data.id;
         this.name = data.name;
         this.blocks = data.blocks.map(function(b){
@@ -28,7 +28,7 @@ define(function (require) {
             blocks: []
         }, json);
 
-        return new Canvas(data);
+        return new Notebook(data);
     }
 
     function factory(json){
