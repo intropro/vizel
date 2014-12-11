@@ -96806,7 +96806,9 @@ define('app/controls/plots/bigNumberChart/bigNumberChart',['require','d3','jquer
     function plotted(element, number) {
         var el = d3.select(element);
 
-        var format = d3.format('0,000');
+        //var format = d3.format('0,000');
+        var format = d3.format('0');
+
 
         var lastNumber = number || 0;
 
