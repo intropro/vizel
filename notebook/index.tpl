@@ -25,7 +25,7 @@
                 <span class="icon-bar"></span>
 -->
             </button>
-            <a class="navbar-brand" href="#/" style="margin-right: 25px;" ng-click="onMenuSelected()">Notebook</a>
+            <a class="navbar-brand" href="#/" style="margin-right: 25px;" ng-click="onMenuSelected()">Vizel</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-left">
