@@ -48,6 +48,11 @@ define(function (require) { require('angular').module('templateCache').run(['$te
   );
 
 
+  $templateCache.put('/app/controls/plots/barChart/barChart.html',
+    "<div class=\"plot-bar-chart\"></div>"
+  );
+
+
   $templateCache.put('/app/controls/plots/bigNumberChart/bigNumberChart.html',
     "<div class=\"big-number-chart\">\r" +
     "\n" +
@@ -310,7 +315,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-markdown_query-legend\" ng-show=\"isEditorFocused\">\r" +
+    "                <p class=\"query-plugin-markdown_query-legend\">\r" +
     "\n" +
     "                    Press Shift+Enter to convert markdown to HTML. Press Enter to start a new line\r" +
     "\n" +
@@ -409,7 +414,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-sql_query-legend\" ng-show=\"isEditorFocused\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
+    "                <p class=\"query-plugin-sql_query-legend\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
     "\n" +
     "                    line\r" +
     "\n" +
@@ -769,21 +774,11 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "<div class=\"content\" ng-if=\"notebook\"  ng-class=\"{\r" +
     "\n" +
-    "    'edit-mode': isEditMode,\r" +
+    "    'edit-mode': !isViewMode,\r" +
     "\n" +
-    "    'view-mode': !isEditMode\r" +
+    "    'view-mode': isViewMode\r" +
     "\n" +
     "    }\">\r" +
-    "\n" +
-    "    <div class=\"view-edit-buttons-container\" style=\"padding-top: 10px;\">\r" +
-    "\n" +
-    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"setViewMode(true);\">View</button>\r" +
-    "\n" +
-    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"setViewMode(false);\">Edit</button>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "\r" +
     "\n" +
     "    <div class=\"block-list\">\r" +
     "\n" +

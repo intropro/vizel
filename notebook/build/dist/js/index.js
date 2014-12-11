@@ -71639,7 +71639,7 @@ define("nvd3", ["angular","d3"], function(){});
                                 d3.select(element[0])
                                     .select('svg')
                                     .datum(data)
-                                    .transition().duration(scope.options.chart['transitionDuration'])
+                                    //.transition().duration(scope.options.chart['transitionDuration'])
                                     .call(scope.chart);
                                 d3.select(element[0]).select('svg')[0][0].style.height = scope.options.chart.height + 'px';
                                 d3.select(element[0]).select('svg')[0][0].style.width = scope.options.chart.width + 'px';
@@ -71653,7 +71653,7 @@ define("nvd3", ["angular","d3"], function(){});
                                     .attr('height', scope.options.chart.height)
                                     .attr('width', scope.options.chart.width)
                                     .datum(data)
-                                    .transition().duration(scope.options.chart['transitionDuration'])
+                                    //.transition().duration(scope.options.chart['transitionDuration'])
                                     .call(scope.chart);
 
                                 // Set up svg height and width. It is important for all browsers...
@@ -71788,7 +71788,7 @@ define("nvd3", ["angular","d3"], function(){});
                         return {
                             classes: {
                                 'with-3d-shadow': true,
-                                'with-transitions': true,
+                                'with-transitions': false,
                                 'gallery': false
                             },
                             css: {}
@@ -93108,7 +93108,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     block: '=sqlQueryPlugin'
                 },
 
-                controller: function ($scope) {
+                controller: function ($scope, $rootScope) {
                     var updateOnChangeTimeout = null;
 
                     $scope.isExecuting = false;
@@ -93139,7 +93139,16 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     });
 
                     $scope.$watch('block.updatePeriod', function () {
-                        if($scope.block.updatePeriod > 0) {
+                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
+                            $scope.request();
+                        } else {
+                            clearTimeout($scope.updateTimeout);
+                            $scope.updateTimeout = null;
+                        }
+                    });
+
+                    $rootScope.$watch('isEnableUpdateIntervals', function () {
+                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
                             $scope.request();
                         } else {
                             clearTimeout($scope.updateTimeout);
@@ -93183,22 +93192,25 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                             $scope.block.data = data.data || [];
                             $scope.block.error = data.error || null;
                             $scope.block.isExecuted = true;
-                            $scope.isExecuting = false;
                             updateBlockOptions();
-
-                            if ($scope.block.updatePeriod) {
+                        }, function (error) {
+                            //handle error
+                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
+                        })['finally'](function(){
+                            $scope.isExecuting = false;
+                            if ($scope.block.updatePeriod && $rootScope.isEnableUpdateIntervals) {
                                 $scope.updateTimeout = setTimeout(function () {
                                     $scope.request();
                                 }, $scope.block.updatePeriod * 1000);
                             }
-                        }, function (error) {
-                            //handle error
-                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
-                            $scope.isExecuting = false;
                         });
                     };
 
                     $scope.executeQuery();
+
+                    $scope.$on("$destroy", function(){
+                        clearTimeout($scope.updateTimeout);
+                    });
 
                     setTimeout(function () {
                         $scope.$broadcast('CodeMirror', function (cm) {
@@ -95382,13 +95394,6 @@ define('app/controllers/IndexController',['require','exports','module','../model
 
                 $scope.errorMessage = null;
 
-                $scope.isEditMode = !(localStorage.getItem('isViewMode') === 'true');
-                $scope.$watch('isEditMode', function () {
-                    localStorage.setItem('isViewMode', !$scope.isEditMode);
-                });
-                $scope.setViewMode = function(isViewMode){
-                    $scope.isEditMode = !isViewMode;
-                };
                 $scope.notebook = null;
                 $scope.blocks = [];
 
@@ -96083,6 +96088,7 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                 $scope.options = {
                     chart: {
                         type: 'multiBarChart',
+                        transitionDuration: 1,
                         margin: {
                             top: 20,
                             right: 20,
@@ -96091,7 +96097,6 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                         },
                         clipEdge: true,
                         staggerLabels: true,
-                        transitionDuration: 200,
                         stacked: false,
                         xAxis: {
                             axisLabel: 'X'
@@ -96141,6 +96146,10 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                         }
                     }
                 };
+
+                function isDate(dateStr) {
+                    return ( (new Date(dateStr) !== "Invalid Date" && !isNaN(new Date(dateStr)) ));
+                }
 
                 function calculateValues(data, x, y) {
                     var keyGroups = [
@@ -96967,7 +96976,253 @@ define('app/controls/plots/bigNumberChart/bigNumberChart',['require','d3','jquer
         };
     });
 });
-define('app/main',['require','./ngModule','./config','./controls/presentationBlock/presentationBlock','./controls/notebookBlock/notebookBlock','./controls/plots/grid/grid','./controls/plots/multiBarChart/multiBarChart','./controls/plots/lineChart/lineChart','./controls/plots/pieChart/pieChart','./controls/plots/mapChart/mapChart','./controls/plots/percentsChart/percentsChart','./controls/plots/bigNumberChart/bigNumberChart'],function(require){
+;
+define('app/controls/plots/barChart/barChart',['require','angular','d3','jquery','../../../ngModule'],function (require) {
+    var ng = require('angular');
+    var d3 = require('d3');
+    var $ = require('jquery');
+    require('../../../ngModule').directive('plotBarChart', function () {
+        return {
+            restrict: 'EA',
+            templateUrl: '/app/controls/plots/barChart/barChart.html',
+            scope: {
+                model: '=plotData'
+            },
+            link: function ($scope, element, attrs) {
+                var plot = barChart(element.find('.plot-bar-chart')[0], {
+                    data: $scope.data,
+                    key: 'datetime',
+                    value: 'watchers_quantity'
+                });
+
+            },
+            controller: function ($scope) {
+                $scope.config = $scope.model.options;
+                $scope.data = [
+                    {
+                        "id": 1,
+                        "datetime": "2014-12-10T12:00:00.000Z",
+                        "watchers_quantity": 0
+                    },
+                    {
+                        "id": 2,
+                        "datetime": "2014-12-10T12:01:00.000Z",
+                        "watchers_quantity": 1
+                    },
+                    {
+                        "id": 3,
+                        "datetime": "2014-12-10T12:02:00.000Z",
+                        "watchers_quantity": 23
+                    },
+                    {
+                        "id": 4,
+                        "datetime": "2014-12-10T12:03:00.000Z",
+                        "watchers_quantity": 34
+                    },
+                    {
+                        "id": 5,
+                        "datetime": "2014-12-10T12:04:00.000Z",
+                        "watchers_quantity": 31
+                    },
+                    {
+                        "id": 6,
+                        "datetime": "2014-12-10T12:05:00.000Z",
+                        "watchers_quantity": 45
+                    },
+                    {
+                        "id": 7,
+                        "datetime": "2014-12-10T12:06:00.000Z",
+                        "watchers_quantity": 34
+                    },
+                    {
+                        "id": 8,
+                        "datetime": "2014-12-10T12:07:00.000Z",
+                        "watchers_quantity": 20
+                    },
+                    {
+                        "id": 9,
+                        "datetime": "2014-12-10T12:08:00.000Z",
+                        "watchers_quantity": 15
+                    },
+                    {
+                        "id": 10,
+                        "datetime": "2014-12-10T12:09:00.000Z",
+                        "watchers_quantity": 30
+                    },
+                    {
+                        "id": 11,
+                        "datetime": "2014-12-10T12:10:00.000Z",
+                        "watchers_quantity": 36
+                    },
+                    {
+                        "id": 12,
+                        "datetime": "2014-12-10T12:11:00.000Z",
+                        "watchers_quantity": 19
+                    },
+                    {
+                        "id": 13,
+                        "datetime": "2014-12-10T12:12:00.000Z",
+                        "watchers_quantity": 20
+                    },
+                    {
+                        "id": 14,
+                        "datetime": "2014-12-10T12:13:00.000Z",
+                        "watchers_quantity": 24
+                    },
+                    {
+                        "id": 15,
+                        "datetime": "2014-12-10T12:14:00.000Z",
+                        "watchers_quantity": 25
+                    },
+                    {
+                        "id": 16,
+                        "datetime": "2014-12-10T12:15:00.000Z",
+                        "watchers_quantity": 39
+                    },
+                    {
+                        "id": 17,
+                        "datetime": "2014-12-10T12:16:00.000Z",
+                        "watchers_quantity": 38
+                    },
+                    {
+                        "id": 18,
+                        "datetime": "2014-12-10T12:17:00.000Z",
+                        "watchers_quantity": 26
+                    }
+                ];
+
+                $scope.$watch('config.key', function () {
+                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                });
+
+                $scope.$watch('config.value', function () {
+                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                });
+
+                $scope.$watch('config.groupBy', function () {
+                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                });
+
+                $scope.updateData = function updateData(x, y, groupBy) {
+                };
+
+                $scope.$watchCollection('model.data', function () {
+                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                });
+            }
+        }
+    });
+
+    function barChart(el, options) {
+        options = ng.extend({
+            data: [],
+            width: 0,
+            height: 0,
+            key: 'key',
+            value: 'value',
+            margin: {
+                top: 20,
+                right: 20,
+                bottom: 40,
+                left: 40
+            }
+        }, options);
+
+        var x = d3.time.scale();
+        var y = d3.scale.linear();
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .ticks(d3.time.seconds)
+            .orient("bottom");
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        var $el = $(el);
+        var canvasOuter = d3.select(el).append('svg');
+        var canvas = canvasOuter.append("g");
+
+        var gy = canvas.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+        var gx = canvas.append("g")
+            .attr("class", "x axis")
+            .call(xAxis);
+
+        var barWidthScale = d3.scale.ordinal()
+            .domain([])
+            .rangeRoundBands(x.range(), 0.1);
+
+        var barWidth = barWidthScale.rangeBand();
+
+
+        var bars = canvas
+            .append('g')
+            .selectAll('.plot-bar-chart__bar');
+
+        calculateSizes();
+
+        updateData();
+
+        function calculateSizes() {
+            options.width = $el.width() - options.margin.left - options.margin.right;
+            options.height = $el.height() - options.margin.top - options.margin.bottom;
+
+            canvasOuter
+                .attr('width', options.width + options.margin.left + options.margin.right)
+                .attr('height', options.height + options.margin.top + options.margin.bottom);
+            canvas
+                .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
+
+            y.domain([d3.min(options.data, function (d) {
+                return d[options.value];
+            }) - 1, d3.max(options.data, function (d) {
+                return d[options.value];
+            })])
+                .range([options.height, 0]);
+
+            x.domain([d3.min(options.data, function (d) {
+                return new Date(d[options.key]);
+            }), d3.max(options.data, function (d) {
+                return new Date(d[options.key]);
+            })])
+                .range([0, options.width]);
+
+            xAxis.scale(x).ticks(d3.time.minutes);
+            yAxis.scale(y);
+//            xAxis.tickSize(6, 0).tickFormat('');
+
+            gx.attr("transform", "translate(0," + options.height + ")").call(xAxis);
+            gy.call(yAxis);
+
+            barWidthScale.domain(options.data.map(function (d) {
+                return new Date(d[options.key]);
+            }))
+                .rangeRoundBands(x.range(), 0.1, 0.1);
+
+            barWidth = barWidthScale.rangeBand();
+        }
+
+        function updateData() {
+            bars.data(options.data)
+                .enter()
+                .append('rect')
+                .attr("class", "plot-bar-chart__bar")
+                .attr('x', function (d) {
+                    return barWidthScale(new Date(d[options.key]));
+//                return x();
+                })
+                .attr('y', function (d) {
+                    return y(d[options.value]);
+                })
+                .attr("height", function (d) {
+                    return options.height - y(d[options.value]);
+                })
+                .attr("width", barWidth);
+        }
+    }
+});
+define('app/main',['require','./ngModule','./config','./controls/presentationBlock/presentationBlock','./controls/notebookBlock/notebookBlock','./controls/plots/grid/grid','./controls/plots/multiBarChart/multiBarChart','./controls/plots/lineChart/lineChart','./controls/plots/pieChart/pieChart','./controls/plots/mapChart/mapChart','./controls/plots/percentsChart/percentsChart','./controls/plots/bigNumberChart/bigNumberChart','./controls/plots/barChart/barChart'],function(require){
     require('./ngModule');
     require('./config');
     require('./controls/presentationBlock/presentationBlock');
@@ -96979,6 +97234,7 @@ define('app/main',['require','./ngModule','./config','./controls/presentationBlo
     require('./controls/plots/mapChart/mapChart');
     require('./controls/plots/percentsChart/percentsChart');
     require('./controls/plots/bigNumberChart/bigNumberChart');
+    require('./controls/plots/barChart/barChart');
 });
 define('app/directives/activeIf',['require','../ngModule'],function (require) {
     require('../ngModule').directive('activeIf', function ($location) {
@@ -97000,13 +97256,53 @@ define('app/directives/activeIf',['require','../ngModule'],function (require) {
         };
     });
 });
-define('app/bootstrap',['require','jquery','angular','../app/ngModule','../app/main','../app/directives/activeIf'],function (require) {
+;
+define('app/controllers/AppController',['require','exports','module','../ngModule'],function (require, exports, module) {
+    module.exports = require('../ngModule')
+        .controller('AppController', [
+            '$scope',
+            '$rootScope',
+            '$location',
+            function ($scope, $rootScope, $location) {
+                if(localStorage.getItem('isEnableUpdateIntervals') === null){
+                    localStorage.setItem('isEnableUpdateIntervals', true);
+                }
+                $rootScope.isViewMode = localStorage.getItem('isViewMode') == 'true';
+                $rootScope.isEnableUpdateIntervals = localStorage.getItem('isEnableUpdateIntervals') == 'true';
+
+                $rootScope.$watch('isViewMode', function(){
+                    localStorage.setItem('isViewMode', $rootScope.isViewMode);
+                });
+
+                $rootScope.$watch('isEnableUpdateIntervals', function(){
+                    localStorage.setItem('isEnableUpdateIntervals', $rootScope.isEnableUpdateIntervals);
+                });
+
+                $scope.changeViewMode = function(){
+                    $rootScope.isViewMode = !$rootScope.isViewMode;
+                };
+
+                $scope.changeIntervals = function(){
+                    $rootScope.isEnableUpdateIntervals = !$rootScope.isEnableUpdateIntervals;
+                };
+
+                $scope.showNotebookButtons = false;
+
+                $scope.$on('$routeChangeSuccess', function(){
+                    $scope.showNotebookButtons = $location.path().search(/^\/notebook\/\d/i) === 0;
+                });
+            }
+        ]);
+});
+
+define('app/bootstrap',['require','jquery','angular','../app/ngModule','../app/main','../app/directives/activeIf','../app/controllers/AppController'],function (require) {
     var $ = require('jquery');
     var ng = require('angular');
 
     require('../app/ngModule');
     require('../app/main');
     require('../app/directives/activeIf');
+    require('../app/controllers/AppController');
 
     //starting angular
     $(function(){
@@ -97060,6 +97356,11 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "</div>\r" +
     "\n"
+  );
+
+
+  $templateCache.put('/app/controls/plots/barChart/barChart.html',
+    "<div class=\"plot-bar-chart\"></div>"
   );
 
 
@@ -97325,7 +97626,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-markdown_query-legend\" ng-show=\"isEditorFocused\">\r" +
+    "                <p class=\"query-plugin-markdown_query-legend\">\r" +
     "\n" +
     "                    Press Shift+Enter to convert markdown to HTML. Press Enter to start a new line\r" +
     "\n" +
@@ -97424,7 +97725,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                </div>\r" +
     "\n" +
-    "                <p class=\"query-plugin-sql_query-legend\" ng-show=\"isEditorFocused\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
+    "                <p class=\"query-plugin-sql_query-legend\">Press Shift+Enter to execute query. Press Enter to start a new\r" +
     "\n" +
     "                    line\r" +
     "\n" +
@@ -97784,21 +98085,11 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "<div class=\"content\" ng-if=\"notebook\"  ng-class=\"{\r" +
     "\n" +
-    "    'edit-mode': isEditMode,\r" +
+    "    'edit-mode': !isViewMode,\r" +
     "\n" +
-    "    'view-mode': !isEditMode\r" +
+    "    'view-mode': isViewMode\r" +
     "\n" +
     "    }\">\r" +
-    "\n" +
-    "    <div class=\"view-edit-buttons-container\" style=\"padding-top: 10px;\">\r" +
-    "\n" +
-    "        <button class=\"btn btn-success btn-sm\" ng-show=\"isEditMode\" ng-click=\"setViewMode(true);\">View</button>\r" +
-    "\n" +
-    "        <button class=\"btn btn-primary btn-sm\" ng-hide=\"isEditMode\" ng-click=\"setViewMode(false);\">Edit</button>\r" +
-    "\n" +
-    "    </div>\r" +
-    "\n" +
-    "\r" +
     "\n" +
     "    <div class=\"block-list\">\r" +
     "\n" +

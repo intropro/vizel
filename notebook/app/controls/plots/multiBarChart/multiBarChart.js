@@ -14,6 +14,7 @@ define(function (require) {
                 $scope.options = {
                     chart: {
                         type: 'multiBarChart',
+                        transitionDuration: 1,
                         margin: {
                             top: 20,
                             right: 20,
@@ -22,7 +23,6 @@ define(function (require) {
                         },
                         clipEdge: true,
                         staggerLabels: true,
-                        transitionDuration: 200,
                         stacked: false,
                         xAxis: {
                             axisLabel: 'X'
@@ -72,6 +72,10 @@ define(function (require) {
                         }
                     }
                 };
+
+                function isDate(dateStr) {
+                    return ( (new Date(dateStr) !== "Invalid Date" && !isNaN(new Date(dateStr)) ));
+                }
 
                 function calculateValues(data, x, y) {
                     var keyGroups = [

@@ -1,13 +1,8 @@
 <div class="notebook-error-message" ng-if="errorMessage">{{errorMessage}}</div>
 <div class="content" ng-if="notebook"  ng-class="{
-    'edit-mode': isEditMode,
-    'view-mode': !isEditMode
+    'edit-mode': !isViewMode,
+    'view-mode': isViewMode
     }">
-    <div class="view-edit-buttons-container" style="padding-top: 10px;">
-        <button class="btn btn-success btn-sm" ng-show="isEditMode" ng-click="setViewMode(true);">View</button>
-        <button class="btn btn-primary btn-sm" ng-hide="isEditMode" ng-click="setViewMode(false);">Edit</button>
-    </div>
-
     <div class="block-list">
         <div notebook-block class="notebook-block"
              ng-class="{

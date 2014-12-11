@@ -10,4 +10,5 @@ define(function(require){
     require('./controls/plots/mapChart/mapChart');
     require('./controls/plots/percentsChart/percentsChart');
     require('./controls/plots/bigNumberChart/bigNumberChart');
+    require('./controls/plots/barChart/barChart');
 });

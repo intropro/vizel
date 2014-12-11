@@ -13,7 +13,7 @@ define(function (require) {
                     block: '=sqlQueryPlugin'
                 },
 
-                controller: function ($scope) {
+                controller: function ($scope, $rootScope) {
                     var updateOnChangeTimeout = null;
 
                     $scope.isExecuting = false;
@@ -44,7 +44,16 @@ define(function (require) {
                     });
 
                     $scope.$watch('block.updatePeriod', function () {
-                        if($scope.block.updatePeriod > 0) {
+                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
+                            $scope.request();
+                        } else {
+                            clearTimeout($scope.updateTimeout);
+                            $scope.updateTimeout = null;
+                        }
+                    });
+
+                    $rootScope.$watch('isEnableUpdateIntervals', function () {
+                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
                             $scope.request();
                         } else {
                             clearTimeout($scope.updateTimeout);
@@ -88,22 +97,25 @@ define(function (require) {
                             $scope.block.data = data.data || [];
                             $scope.block.error = data.error || null;
                             $scope.block.isExecuted = true;
-                            $scope.isExecuting = false;
                             updateBlockOptions();
-
-                            if ($scope.block.updatePeriod) {
+                        }, function (error) {
+                            //handle error
+                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
+                        })['finally'](function(){
+                            $scope.isExecuting = false;
+                            if ($scope.block.updatePeriod && $rootScope.isEnableUpdateIntervals) {
                                 $scope.updateTimeout = setTimeout(function () {
                                     $scope.request();
                                 }, $scope.block.updatePeriod * 1000);
                             }
-                        }, function (error) {
-                            //handle error
-                            $scope.errorMessage = error.error || "Oops... Something went wrong.";
-                            $scope.isExecuting = false;
                         });
                     };
 
                     $scope.executeQuery();
+
+                    $scope.$on("$destroy", function(){
+                        clearTimeout($scope.updateTimeout);
+                    });
 
                     setTimeout(function () {
                         $scope.$broadcast('CodeMirror', function (cm) {

@@ -5,6 +5,7 @@ define(function (require) {
     require('../app/ngModule');
     require('../app/main');
     require('../app/directives/activeIf');
+    require('../app/controllers/AppController');
 
     //starting angular
     $(function(){
