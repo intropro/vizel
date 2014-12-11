@@ -30,7 +30,7 @@ trait PerRequest extends Actor with Json4sSupport{
     //implicit val json4sFormats = DefaultFormats.withBigDecimal
     override val json4sFormats = DefaultFormats.withBigDecimal
 
-    setReceiveTimeout(5.seconds)
+    setReceiveTimeout(30.seconds)
 
     target ! message
 

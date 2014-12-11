@@ -7,7 +7,7 @@ import AssemblyKeys._
 object build extends Build {
 
   val Settings = Defaults.defaultSettings ++ Seq(
-    version := "0.0.3-SNAPSHOT",
+    version := "0.0.4-SNAPSHOT",
     organization := "com.intropro",
     scalaVersion := "2.11.0",
     crossScalaVersions := Seq("2.10.0", "2.11.0"),

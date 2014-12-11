@@ -11,7 +11,7 @@ import spray.can.Http
 object Boot extends App {
 
 
-  def start(host:String="localhost",port:Int=9090) = {
+  def start(host:String="0.0.0.0",port:Int=9090) = {
     // we need an ActorSystem to host our application in
     implicit val system = ActorSystem("vizel")
 
