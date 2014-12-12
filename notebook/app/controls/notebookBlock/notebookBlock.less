@@ -1,11 +1,11 @@
 .notebook-block {
   position: relative;
-  margin-top: 5px;
+  margin-top: 15px;
 }
 
 .edit-mode {
   .notebook-block {
-    &:hover  {
+    &:hover {
       .notebook-buttons-block {
         display: block;
       }
@@ -65,7 +65,7 @@
 }
 
 .edit-mode {
-  .notebook-block:hover{
+  .notebook-block:hover {
     .notebook-block-content {
       border-color: #d6d6d6;
     }
@@ -79,4 +79,23 @@
   .notebook-block_buttons {
     display: none;
   }
+  .notebook-block__title-editable {
+    display: none;
+  }
+  .notebook-block__title{
+    display: block;
+  }
+}
+
+.notebook-block__title {
+  display: none;
+}
+
+.notebook-block__title-editable {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-style: dashed;
+  margin-top: 25px;
+  margin-bottom: 10px;
 }

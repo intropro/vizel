@@ -220,13 +220,13 @@ define(function (require) {
                 $scope.data = {
                     val: 0
                 };
-                var plot = plotted(element.find('.percents-chart')[0], $scope.data.val);
+                $scope.plot = plotted(element.find('.percents-chart')[0], $scope.data.val);
 
                 $scope.$watch('data.val', function(){
-                    plot.updateData($scope.data.val);
+                    $scope.plot.updateData($scope.data.val);
                 });
                 $scope.destroyPlot = function(){
-                    plot.destroy();
+                    $scope.plot.destroy();
                 }
             },
             controller: function ($scope) {
@@ -245,12 +245,14 @@ define(function (require) {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('config.groupBy', function () {
+                $scope.$watch('model.data', function(){
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('model.data', function(){
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                $scope.$watch('model.size', function(){
+                    setTimeout(function() {
+                        $scope.plot.updateSizes();
+                    }, 0);
                 });
 
                 $scope.$on('$destroy', function(){

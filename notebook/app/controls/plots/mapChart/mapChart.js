@@ -78,10 +78,6 @@ define(function (require) {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('config.groupBy', function () {
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
-                });
-
                 $scope.$watchCollection('model.data', function () {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });

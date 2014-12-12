@@ -1878,13 +1878,13 @@ header:after {
 .query-plugin-sql_query-container {
   position: relative;
   padding-left: 15px;
-  margin-top: 15px;
+  margin-top: 0px;
   margin-bottom: 10px;
 }
 .query-plugin-sql_query-prefix {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 7px;
   font-weight: bold;
   color: #ADADAD;
 }
@@ -1926,13 +1926,13 @@ header:after {
 .query-plugin-markdown_query-container {
   position: relative;
   padding-left: 15px;
-  margin-top: 15px;
+  margin-top: 0px;
   margin-bottom: 10px;
 }
 .query-plugin-markdown_query-prefix {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 7px;
   font-weight: bold;
   color: #ADADAD;
 }
@@ -2007,7 +2007,7 @@ body .CodeMirror {
 }
 .notebook-block {
   position: relative;
-  margin-top: 5px;
+  margin-top: 15px;
 }
 .edit-mode .notebook-block:hover .notebook-buttons-block {
   display: block;
@@ -2063,6 +2063,23 @@ body .CodeMirror {
 }
 .view-mode .notebook-block_buttons {
   display: none;
+}
+.view-mode .notebook-block__title-editable {
+  display: none;
+}
+.view-mode .notebook-block__title {
+  display: block;
+}
+.notebook-block__title {
+  display: none;
+}
+.notebook-block__title-editable {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-style: dashed;
+  margin-top: 25px;
+  margin-bottom: 10px;
 }
 .presentation-control-container-table {
   height: 400px;
@@ -2121,20 +2138,32 @@ body .CodeMirror {
 }
 .plot-bar-chart__bar {
   fill: #1f77b4;
+  opacity: .9;
 }
 .plot-bar-chart__bar:hover {
   fill: #2495e0;
-  opacity: .9;
+  opacity: 1;
 }
 .plot-bar-chart__tooltip {
   position: absolute;
   background: #fff;
   border: 1px solid #ddd;
-  z-index: 999;
+  z-index: 10000;
   display: none;
 }
 .plot-bar-chart__tooltip .plot-bar-chart__tooltip_content {
   padding: 10px;
+}
+.plot-bar-chart__tooltip .plot-bar-chart__tooltip_content h3 {
+  margin: 0;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  line-height: 1.3em;
+  margin-bottom: 5px;
+  font-weight: normal;
+}
+.plot-bar-chart__tooltip .plot-bar-chart__tooltip_content p {
+  margin: 0;
 }
 .plot-line-chart {
   height: 100%;
@@ -2226,7 +2255,7 @@ body .CodeMirror {
 }
 .block-list {
   margin-bottom: 10px;
-  margin-top: 15px;
+  margin-top: 0px;
 }
 .block-list:before,
 .block-list:after {

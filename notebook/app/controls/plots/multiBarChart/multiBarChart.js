@@ -11,6 +11,8 @@ define(function (require) {
             controller: function ($scope) {
                 $scope.config = $scope.model.options;
                 $scope.data = [];
+
+                var lastDate = null;
                 $scope.options = {
                     chart: {
                         type: 'multiBarChart',
@@ -25,10 +27,31 @@ define(function (require) {
                         staggerLabels: true,
                         stacked: false,
                         xAxis: {
-                            axisLabel: 'X'
+                            axisLabel: 'X',
+                            tickFormat: function (d, i) {
+                                if (d instanceof Date) {
+                                    var full = d3.time.format('%x %X');
+                                    var short = d3.time.format('%X');
+                                    var f = full;
+                                    if(i == 0){
+                                        f = full;
+                                    } else {
+                                        if(lastDate && lastDate.getDate() == d.getDate()){
+                                            f = short;
+                                        }
+                                    }
+                                    lastDate = d;
+                                    return f(d);
+                                } else {
+                                    return d;
+                                }
+                            }
                         },
                         yAxis: {
                             axisLabel: 'Y'
+                        },
+                        tooltip: function(label, key, value){
+                            return '<h3>' + label + '</h3>' + '<p>' + value + ' on ' + key + '</p>';
                         }
                     }
                 };
@@ -106,6 +129,9 @@ define(function (require) {
                             x: x && d[0] ? d[0][x] : i + 1,
                             y: 0
                         };
+                        if (valueObject.x && isDate(valueObject.x)) {
+                            valueObject.x = new Date(valueObject.x);
+                        }
                         if ($.isArray(d)) {
                             valueObject.y = d3.sum(d, function (data, index) {
                                 if (y) {

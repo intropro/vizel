@@ -3,6 +3,12 @@
     <div class="row">
         <div class="col-12-10 col-md-12">
             <div class="form-group">
+                <label class="block-options-label">Title:</label>
+                <input type="text" class="form-control" ng-model="block.title" style="display: inline-block; width: auto;" placeholder="Type title here" />
+            </div>
+
+
+            <div class="form-group">
                 <label class="block-options-label">Language:</label>
                 <div class="btn-group" dropdown>
                     <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>{{block.plugin.queryLanguage || '[select language]'}}<span class="caret"></span>

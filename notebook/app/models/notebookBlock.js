@@ -25,6 +25,7 @@ define(function (require) {
             return queryVariable.factory(v);
         });
         this.plugin = null;
+        this.title = data.title;
     }
 
     function toJson(b){
@@ -48,7 +49,8 @@ define(function (require) {
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
-            })
+            }),
+            title: b.title
         };
     }
 
@@ -74,7 +76,8 @@ define(function (require) {
             clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],
-            variables: []
+            variables: [],
+            title: ''
 
         }, json);
         return new NotebookBlock(data);

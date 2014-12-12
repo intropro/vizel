@@ -6,7 +6,6 @@
                 <div class="col-lg-12 col-md-4 col-sm-4" style="margin-bottom:10px;">
                     <div>Key:</div>
                     <select ng-model="block.options.key" ng-options="value for value in block.options.availableKeys">
-                        <option value="">[index]</option>
                     </select>
                     <div>Key type:</div>
                     <select ng-model="block.options.keyType" ng-options="t for t in block.options.types"></select>
@@ -15,17 +14,9 @@
                     <div>Value:</div>
                     <select ng-model="block.options.value"
                             ng-options="value for value in block.options.availableValues">
-                        <option value="">[index]</option>
                     </select>
                     <div>Value type:</div>
                     <select ng-model="block.options.valueType" ng-options="t for t in block.options.types"></select>
-                </div>
-                <div class="col-lg-12 col-md-4 col-sm-4" style="margin-bottom:10px;">
-                    <div>Group by:</div>
-                    <select ng-model="block.options.groupBy"
-                            ng-options="value for value in block.options.types">
-                        <option value="">[none]</option>
-                    </select>
                 </div>
             </div>
         </div>

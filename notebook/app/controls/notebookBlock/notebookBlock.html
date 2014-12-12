@@ -1,6 +1,9 @@
 <div class="notebook-block-content">
     <i ng-show="isExecuting" class="notebook-block-executing-spinner"></i>
 
+    <h3 class="text-center notebook-block__title">{{block.title}}</h3>
+    <input type="text" class="form-control notebook-block__title-editable" ng-model="block.title" placeholder="Type title here"/>
+
     <div ng-include="block.plugin.snippetUrl">
     </div>
 

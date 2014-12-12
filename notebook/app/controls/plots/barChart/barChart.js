@@ -20,7 +20,9 @@ define(function (require) {
                     },
                     yAxis: {
                         type: $scope.model.options.valueType//'number', 'string'
-                    }
+                    },
+                    key: $scope.config.key,
+                    value: $scope.config.value
                 });
 
                 $scope.recreatePlot = function(){
@@ -31,13 +33,16 @@ define(function (require) {
                         },
                         yAxis: {
                             type: $scope.model.options.valueType//'number', 'string'
-                        }
+                        },
+                        key: $scope.config.key,
+                        value: $scope.config.value
                     });
                 };
 
                 //update data
                 $scope.$watch('data', function () {
                     if ($scope.plot) {
+                        console.log($scope.data);
                         $scope.plot.updateAll($scope.data);
                     }
                 });
@@ -100,10 +105,10 @@ define(function (require) {
                         if (valueType === 'number') {
                             value = +value;
                         }
-                        return {
-                            x: key,
-                            y: value
-                        }
+                        var result = {};
+                        result[x] = key;
+                        result[y] = value;
+                        return result;
                     });
 
                 };

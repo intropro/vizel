@@ -5,9 +5,10 @@
 
 .plot-bar-chart__bar {
   fill: #1f77b4;
+  opacity: .9;
   &:hover {
     fill: #2495e0;
-    opacity: .9;
+    opacity:1;
   }
 }
 
@@ -15,10 +16,23 @@
   position:absolute;
   background: #fff;
   border:1px solid #ddd;
-  z-index: 999;
+  z-index: 10000;
   display: none;
 
   .plot-bar-chart__tooltip_content{
     padding: 10px;
+
+    & h3 {
+      margin: 0;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      line-height: 1.3em;
+      margin-bottom: 5px;
+      font-weight: normal;
+    }
+
+    & p {
+      margin: 0;
+    }
   }
 }

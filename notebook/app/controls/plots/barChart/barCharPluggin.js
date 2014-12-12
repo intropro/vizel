@@ -24,6 +24,7 @@ define(function (require) {
 
             }
         }, options);
+        console.log(this.options);
 
         this.el = el;
         this.$el = $(el);
@@ -73,6 +74,7 @@ define(function (require) {
 
     BarCharPluggin.prototype = {
         updateData: function () {
+            console.log('key, value:', this.options.key,this.options.value);
             this.colorScale.domain([d3.min(this.options.data, function (d) {
                 return d[this.options.value];
             }.bind(this)), d3.max(this.options.data, function (d) {
@@ -165,22 +167,27 @@ define(function (require) {
         updateXScale: function () {
             if (this.options.xAxis.type === 'string' && false) {
                 this.xScale
-                    .domain(this.options.data.map(function(d){ return d[this.options.key]}.bind(this)))
+                    .domain(this.options.data.map(function (d) {
+                        return d[this.options.key]
+                    }.bind(this)))
                     .rangeRoundBands([0, this.options.width]);
             } else {
+                var firstItem = this.options.data[0];
+                var lastItem = this.options.data[this.options.data.length > 0 ? this.options.data.length - 1 : 0];
                 this.xScale
-                    .domain([d3.min(this.options.data, function (d) {
-                        return d[this.options.key];
-                    }.bind(this)), d3.max(this.options.data, function (d) {
-                        return d[this.options.key];
-                    }.bind(this))])
+                    .domain([
+                        firstItem ? firstItem[this.options.key] : 0,
+                        lastItem ? lastItem[this.options.key] : 0
+                    ])
                     .range([0, this.options.width]);
             }
         },
         updateYScale: function () {
             if (this.options.yAxis.type === 'string' && false) {
                 this.yScale
-                    .domain(this.options.data.map(function(d){ return d[this.options.value]}.bind(this)))
+                    .domain(this.options.data.map(function (d) {
+                        return d[this.options.value]
+                    }.bind(this)))
                     .rangeRoundBands([0, this.options.height]);
             } else {
                 this.yScale.domain([d3.min(this.options.data, function (d) {
@@ -265,7 +272,7 @@ define(function (require) {
             if (valueData instanceof Date) {
                 valueData = d3.time.format("%x %X")(valueData)
             }
-            return keyData + ' - ' + valueData;
+            return '<h3>' + this.options.key + '</h3><p>' + valueData + ' at ' + keyData + '</p>';
         }
     };
 

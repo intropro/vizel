@@ -7,6 +7,12 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
+    "    <h3 class=\"text-center notebook-block__title\">{{block.title}}</h3>\r" +
+    "\n" +
+    "    <input type=\"text\" class=\"form-control notebook-block__title-editable\" ng-model=\"block.title\" placeholder=\"Type title here\"/>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
     "    <div ng-include=\"block.plugin.snippetUrl\">\r" +
     "\n" +
     "    </div>\r" +
@@ -276,7 +282,7 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "\r" +
     "\n" +
-    "        <button class=\"btn btn-default\" ng-hide=\"block.type == types.grid\"\r" +
+    "        <button class=\"btn btn-primary\" ng-hide=\"block.type == types.grid\" style=\"margin-left: 20px;\"\r" +
     "\n" +
     "                ng-click=\"showPlotOptions(block, plotOptions)\">\r" +
     "\n" +
@@ -566,6 +572,18 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "    <div class=\"row\">\r" +
     "\n" +
     "        <div class=\"col-12-10 col-md-12\">\r" +
+    "\n" +
+    "            <div class=\"form-group\">\r" +
+    "\n" +
+    "                <label class=\"block-options-label\">Title:</label>\r" +
+    "\n" +
+    "                <input type=\"text\" class=\"form-control\" ng-model=\"block.title\" style=\"display: inline-block; width: auto;\" placeholder=\"Type title here\" />\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "            <div class=\"form-group\">\r" +
     "\n" +
@@ -913,8 +931,6 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                    <select ng-model=\"block.options.key\" ng-options=\"value for value in block.options.availableKeys\">\r" +
     "\n" +
-    "                        <option value=\"\">[index]</option>\r" +
-    "\n" +
     "                    </select>\r" +
     "\n" +
     "                    <div>Key type:</div>\r" +
@@ -931,27 +947,11 @@ define(function (require) { require('angular').module('templateCache').run(['$te
     "\n" +
     "                            ng-options=\"value for value in block.options.availableValues\">\r" +
     "\n" +
-    "                        <option value=\"\">[index]</option>\r" +
-    "\n" +
     "                    </select>\r" +
     "\n" +
     "                    <div>Value type:</div>\r" +
     "\n" +
     "                    <select ng-model=\"block.options.valueType\" ng-options=\"t for t in block.options.types\"></select>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "                <div class=\"col-lg-12 col-md-4 col-sm-4\" style=\"margin-bottom:10px;\">\r" +
-    "\n" +
-    "                    <div>Group by:</div>\r" +
-    "\n" +
-    "                    <select ng-model=\"block.options.groupBy\"\r" +
-    "\n" +
-    "                            ng-options=\"value for value in block.options.types\">\r" +
-    "\n" +
-    "                        <option value=\"\">[none]</option>\r" +
-    "\n" +
-    "                    </select>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +

@@ -93125,7 +93125,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     $scope.updateTimeout = null;
                     $scope.isEditorFocused = false;
 
-                    $scope.$watch('block.variables', function() {
+                    $scope.$watch('block.variables', function () {
                         if (!$scope.block.isExecuted) {
                             return;
                         }
@@ -93139,7 +93139,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     });
 
                     $scope.$watch('block.updatePeriod', function () {
-                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
+                        if ($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
                             $scope.request();
                         } else {
                             clearTimeout($scope.updateTimeout);
@@ -93148,7 +93148,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                     });
 
                     $rootScope.$watch('isEnableUpdateIntervals', function () {
-                        if($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
+                        if ($scope.block.updatePeriod > 0 && $rootScope.isEnableUpdateIntervals) {
                             $scope.request();
                         } else {
                             clearTimeout($scope.updateTimeout);
@@ -93156,7 +93156,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                         }
                     });
 
-                    $scope.executeQuery = function() {
+                    $scope.executeQuery = function () {
                         var input = $scope.block.in;
                         var variableRegex = /(\$\w+)/gmi;
                         var variables = [];
@@ -93164,8 +93164,10 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                         var uniqueVar = {};
                         while (r) {
                             var varName = r[1].substr(1);
-                            var oldVar = $scope.block.variables.filter(function(v){ return v.name === varName})[0];
-                            if(oldVar){
+                            var oldVar = $scope.block.variables.filter(function (v) {
+                                return v.name === varName
+                            })[0];
+                            if (oldVar) {
                                 uniqueVar[varName] = oldVar;
                                 variables.push(uniqueVar[varName]);
                             }
@@ -93196,7 +93198,7 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                         }, function (error) {
                             //handle error
                             $scope.errorMessage = error.error || "Oops... Something went wrong.";
-                        })['finally'](function(){
+                        })['finally'](function () {
                             $scope.isExecuting = false;
                             if ($scope.block.updatePeriod && $rootScope.isEnableUpdateIntervals) {
                                 $scope.updateTimeout = setTimeout(function () {
@@ -93208,39 +93210,77 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
 
                     $scope.executeQuery();
 
-                    $scope.$on("$destroy", function(){
+                    $scope.$on("$destroy", function () {
                         clearTimeout($scope.updateTimeout);
                     });
 
                     setTimeout(function () {
                         $scope.$broadcast('CodeMirror', function (cm) {
-                            cm.on('focus', function(){
+                            cm.on('focus', function () {
                                 $scope.isEditorFocused = true;
-                                if(!$scope.$$phase){
+                                if (!$scope.$$phase) {
                                     $scope.$apply();
                                 }
                             });
-                            cm.on('blur', function(){
+                            cm.on('blur', function () {
                                 $scope.isEditorFocused = false;
-                                if(!$scope.$$phase){
+                                if (!$scope.$$phase) {
                                     $scope.$apply();
                                 }
                             });
                         });
                     }, 0);
 
-                    function updateQuery(){
+                    $scope.$watch('block.options.key', function (newVal) {
+                        var firstItemKey = $scope.block.data[0] ? $scope.block.data[0][newVal] : null;
+                        if (firstItemKey !== null) {
+                            //check if firstItemKey is number
+                            if (!isNaN(+firstItemKey)) {
+                                //set keyType to number
+                                $scope.block.options.keyType = 'number';
+                            } else if (isDate(firstItemKey)) {//check if firstItemKey is Date
+                                //set firstItemKey to datetime
+                                $scope.block.options.keyType = 'datetime';
+                            } else {
+                                //set firstItemKey to string
+                                $scope.block.options.keyType = 'string';
+                            }
+                        }
+                    });
+
+                    $scope.$watch('block.options.value', function (newVal) {
+                        var firstItemValue = $scope.block.data[0] ? $scope.block.data[0][newVal] : null;
+                        if (firstItemValue !== null) {
+                            //check if firstItemValue is number
+                            if (!isNaN(+firstItemValue)) {
+                                //set keyType to number
+                                $scope.block.options.valueType = 'number';
+                            } else if (isDate(firstItemValue)) {//check if firstItemValue is Date
+                                //set firstItemValue to datetime
+                                $scope.block.options.valueType = 'datetime';
+                            } else {
+                                //set firstItemValue to string
+                                $scope.block.options.valueType = 'string';
+                            }
+                        }
+                    });
+
+                    function isDate(dateStr) {
+                        return ( (new Date(dateStr) !== "Invalid Date" && !isNaN(new Date(dateStr)) ));
+                    }
+
+                    function updateQuery() {
                         var str = $scope.block.in;
-                        $scope.block.variables.forEach(function(v){
+                        $scope.block.variables.forEach(function (v) {
                             str = str.replace(new RegExp("\\$" + v.name, "g"), v.value);
                         });
                         $scope.block.query = str;
                         $scope.request();
                     }
 
-                    function updateBlockOptions(){
+                    function updateBlockOptions() {
                         var columns = [];
-                        if($scope.block.data[0]){
+                        if ($scope.block.data[0]) {
                             columns = Object.keys($scope.block.data[0]).map(function (d) {
                                 return {
                                     key: d,
@@ -93257,20 +93297,12 @@ define('sqlQueryPluginModule/sqlQueryPlugin_control/sqlQueryPlugin',['require','
                             return d.key;
                         });
 
-                        if($scope.block.options.availableKeys.indexOf($scope.block.options.key) == -1){
+                        if ($scope.block.options.availableKeys.indexOf($scope.block.options.key) == -1) {
                             $scope.block.options.key = $scope.block.options.availableKeys[0] || null;
                         }
 
-                        if($scope.block.options.availableValues.indexOf($scope.block.options.va) == -1){
+                        if ($scope.block.options.availableValues.indexOf($scope.block.options.va) == -1) {
                             $scope.block.options.value = ($scope.block.options.availableValues[1] || $scope.block.options.availableValues[0]) || null;
-                        }
-
-                        if($scope.block.options.types.indexOf($scope.block.options.keyType) == -1){
-                            $scope.block.options.keyType = $scope.block.options.types[0];
-                        }
-
-                        if($scope.block.options.types.indexOf($scope.block.options.valueType) == -1){
-                            $scope.block.options.valueType = $scope.block.options.types[0];
                         }
                     }
                 }
@@ -95318,6 +95350,7 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./back
             return queryVariable.factory(v);
         });
         this.plugin = null;
+        this.title = data.title;
     }
 
     function toJson(b){
@@ -95341,7 +95374,8 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./back
             size: b.size,
             variables: b.variables.map(function (v) {
                 return queryVariable.toJson(v)
-            })
+            }),
+            title: b.title
         };
     }
 
@@ -95367,7 +95401,8 @@ define('app/models/notebookBlock',['require','angular','./queryVariable','./back
             clusterId: null,
             size: 12,
             availableSizes: [2,3,4,6,8,12],
-            variables: []
+            variables: [],
+            title: ''
 
         }, json);
         return new NotebookBlock(data);
@@ -96099,6 +96134,8 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
             controller: function ($scope) {
                 $scope.config = $scope.model.options;
                 $scope.data = [];
+
+                var lastDate = null;
                 $scope.options = {
                     chart: {
                         type: 'multiBarChart',
@@ -96113,10 +96150,31 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                         staggerLabels: true,
                         stacked: false,
                         xAxis: {
-                            axisLabel: 'X'
+                            axisLabel: 'X',
+                            tickFormat: function (d, i) {
+                                if (d instanceof Date) {
+                                    var full = d3.time.format('%x %X');
+                                    var short = d3.time.format('%X');
+                                    var f = full;
+                                    if(i == 0){
+                                        f = full;
+                                    } else {
+                                        if(lastDate && lastDate.getDate() == d.getDate()){
+                                            f = short;
+                                        }
+                                    }
+                                    lastDate = d;
+                                    return f(d);
+                                } else {
+                                    return d;
+                                }
+                            }
                         },
                         yAxis: {
                             axisLabel: 'Y'
+                        },
+                        tooltip: function(label, key, value){
+                            return '<h3>' + label + '</h3>' + '<p>' + value + ' on ' + key + '</p>';
                         }
                     }
                 };
@@ -96194,6 +96252,9 @@ define('app/controls/plots/multiBarChart/multiBarChart',['require','d3','../../.
                             x: x && d[0] ? d[0][x] : i + 1,
                             y: 0
                         };
+                        if (valueObject.x && isDate(valueObject.x)) {
+                            valueObject.x = new Date(valueObject.x);
+                        }
                         if ($.isArray(d)) {
                             valueObject.y = d3.sum(d, function (data, index) {
                                 if (y) {
@@ -96772,13 +96833,13 @@ define('app/controls/plots/percentsChart/percentsChart',['require','d3','jquery'
                 $scope.data = {
                     val: 0
                 };
-                var plot = plotted(element.find('.percents-chart')[0], $scope.data.val);
+                $scope.plot = plotted(element.find('.percents-chart')[0], $scope.data.val);
 
                 $scope.$watch('data.val', function(){
-                    plot.updateData($scope.data.val);
+                    $scope.plot.updateData($scope.data.val);
                 });
                 $scope.destroyPlot = function(){
-                    plot.destroy();
+                    $scope.plot.destroy();
                 }
             },
             controller: function ($scope) {
@@ -96797,12 +96858,14 @@ define('app/controls/plots/percentsChart/percentsChart',['require','d3','jquery'
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('config.groupBy', function () {
+                $scope.$watch('model.data', function(){
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('model.data', function(){
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                $scope.$watch('model.size', function(){
+                    setTimeout(function() {
+                        $scope.plot.updateSizes();
+                    }, 0);
                 });
 
                 $scope.$on('$destroy', function(){
@@ -97019,6 +97082,7 @@ define('app/controls/plots/barChart/barCharPluggin',['require','jquery','d3'],fu
 
             }
         }, options);
+        console.log(this.options);
 
         this.el = el;
         this.$el = $(el);
@@ -97068,6 +97132,7 @@ define('app/controls/plots/barChart/barCharPluggin',['require','jquery','d3'],fu
 
     BarCharPluggin.prototype = {
         updateData: function () {
+            console.log('key, value:', this.options.key,this.options.value);
             this.colorScale.domain([d3.min(this.options.data, function (d) {
                 return d[this.options.value];
             }.bind(this)), d3.max(this.options.data, function (d) {
@@ -97160,22 +97225,27 @@ define('app/controls/plots/barChart/barCharPluggin',['require','jquery','d3'],fu
         updateXScale: function () {
             if (this.options.xAxis.type === 'string' && false) {
                 this.xScale
-                    .domain(this.options.data.map(function(d){ return d[this.options.key]}.bind(this)))
+                    .domain(this.options.data.map(function (d) {
+                        return d[this.options.key]
+                    }.bind(this)))
                     .rangeRoundBands([0, this.options.width]);
             } else {
+                var firstItem = this.options.data[0];
+                var lastItem = this.options.data[this.options.data.length > 0 ? this.options.data.length - 1 : 0];
                 this.xScale
-                    .domain([d3.min(this.options.data, function (d) {
-                        return d[this.options.key];
-                    }.bind(this)), d3.max(this.options.data, function (d) {
-                        return d[this.options.key];
-                    }.bind(this))])
+                    .domain([
+                        firstItem ? firstItem[this.options.key] : 0,
+                        lastItem ? lastItem[this.options.key] : 0
+                    ])
                     .range([0, this.options.width]);
             }
         },
         updateYScale: function () {
             if (this.options.yAxis.type === 'string' && false) {
                 this.yScale
-                    .domain(this.options.data.map(function(d){ return d[this.options.value]}.bind(this)))
+                    .domain(this.options.data.map(function (d) {
+                        return d[this.options.value]
+                    }.bind(this)))
                     .rangeRoundBands([0, this.options.height]);
             } else {
                 this.yScale.domain([d3.min(this.options.data, function (d) {
@@ -97260,7 +97330,7 @@ define('app/controls/plots/barChart/barCharPluggin',['require','jquery','d3'],fu
             if (valueData instanceof Date) {
                 valueData = d3.time.format("%x %X")(valueData)
             }
-            return keyData + ' - ' + valueData;
+            return '<h3>' + this.options.key + '</h3><p>' + valueData + ' at ' + keyData + '</p>';
         }
     };
 
@@ -97292,7 +97362,9 @@ define('app/controls/plots/barChart/barChart',['require','angular','d3','jquery'
                     },
                     yAxis: {
                         type: $scope.model.options.valueType//'number', 'string'
-                    }
+                    },
+                    key: $scope.config.key,
+                    value: $scope.config.value
                 });
 
                 $scope.recreatePlot = function(){
@@ -97303,13 +97375,16 @@ define('app/controls/plots/barChart/barChart',['require','angular','d3','jquery'
                         },
                         yAxis: {
                             type: $scope.model.options.valueType//'number', 'string'
-                        }
+                        },
+                        key: $scope.config.key,
+                        value: $scope.config.value
                     });
                 };
 
                 //update data
                 $scope.$watch('data', function () {
                     if ($scope.plot) {
+                        console.log($scope.data);
                         $scope.plot.updateAll($scope.data);
                     }
                 });
@@ -97372,10 +97447,10 @@ define('app/controls/plots/barChart/barChart',['require','angular','d3','jquery'
                         if (valueType === 'number') {
                             value = +value;
                         }
-                        return {
-                            x: key,
-                            y: value
-                        }
+                        var result = {};
+                        result[x] = key;
+                        result[y] = value;
+                        return result;
                     });
 
                 };
@@ -97480,6 +97555,12 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "<div class=\"notebook-block-content\">\r" +
     "\n" +
     "    <i ng-show=\"isExecuting\" class=\"notebook-block-executing-spinner\"></i>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "    <h3 class=\"text-center notebook-block__title\">{{block.title}}</h3>\r" +
+    "\n" +
+    "    <input type=\"text\" class=\"form-control notebook-block__title-editable\" ng-model=\"block.title\" placeholder=\"Type title here\"/>\r" +
     "\n" +
     "\r" +
     "\n" +
@@ -97752,7 +97833,7 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "\r" +
     "\n" +
-    "        <button class=\"btn btn-default\" ng-hide=\"block.type == types.grid\"\r" +
+    "        <button class=\"btn btn-primary\" ng-hide=\"block.type == types.grid\" style=\"margin-left: 20px;\"\r" +
     "\n" +
     "                ng-click=\"showPlotOptions(block, plotOptions)\">\r" +
     "\n" +
@@ -98042,6 +98123,18 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "    <div class=\"row\">\r" +
     "\n" +
     "        <div class=\"col-12-10 col-md-12\">\r" +
+    "\n" +
+    "            <div class=\"form-group\">\r" +
+    "\n" +
+    "                <label class=\"block-options-label\">Title:</label>\r" +
+    "\n" +
+    "                <input type=\"text\" class=\"form-control\" ng-model=\"block.title\" style=\"display: inline-block; width: auto;\" placeholder=\"Type title here\" />\r" +
+    "\n" +
+    "            </div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "            <div class=\"form-group\">\r" +
     "\n" +
@@ -98389,8 +98482,6 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                    <select ng-model=\"block.options.key\" ng-options=\"value for value in block.options.availableKeys\">\r" +
     "\n" +
-    "                        <option value=\"\">[index]</option>\r" +
-    "\n" +
     "                    </select>\r" +
     "\n" +
     "                    <div>Key type:</div>\r" +
@@ -98407,27 +98498,11 @@ define('build/dist/js/template-cache',['require','angular'],function (require) {
     "\n" +
     "                            ng-options=\"value for value in block.options.availableValues\">\r" +
     "\n" +
-    "                        <option value=\"\">[index]</option>\r" +
-    "\n" +
     "                    </select>\r" +
     "\n" +
     "                    <div>Value type:</div>\r" +
     "\n" +
     "                    <select ng-model=\"block.options.valueType\" ng-options=\"t for t in block.options.types\"></select>\r" +
-    "\n" +
-    "                </div>\r" +
-    "\n" +
-    "                <div class=\"col-lg-12 col-md-4 col-sm-4\" style=\"margin-bottom:10px;\">\r" +
-    "\n" +
-    "                    <div>Group by:</div>\r" +
-    "\n" +
-    "                    <select ng-model=\"block.options.groupBy\"\r" +
-    "\n" +
-    "                            ng-options=\"value for value in block.options.types\">\r" +
-    "\n" +
-    "                        <option value=\"\">[none]</option>\r" +
-    "\n" +
-    "                    </select>\r" +
     "\n" +
     "                </div>\r" +
     "\n" +
