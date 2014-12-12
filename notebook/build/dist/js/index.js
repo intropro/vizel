@@ -96329,10 +96329,6 @@ define('app/controls/plots/lineChart/lineChart',['require','d3','jquery','../../
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('config.groupBy', function () {
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
-                });
-
                 $scope.$watchCollection('model.data', function () {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
@@ -96597,10 +96593,6 @@ define('app/controls/plots/mapChart/mapChart',['require','d3','jquery','../../..
                 });
 
                 $scope.$watch('config.value', function () {
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
-                });
-
-                $scope.$watch('config.groupBy', function () {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
@@ -97014,14 +97006,14 @@ define('app/controls/plots/bigNumberChart/bigNumberChart',['require','d3','jquer
                     val: 0
                 };
 
-                var plot = plotted(element.find('.big-number-chart')[0]);
+                $scope.plot = plotted(element.find('.big-number-chart')[0]);
 
                 $scope.$watch('data.val', function () {
-                    plot.updateData($scope.data.val);
+                    $scope.plot.updateData($scope.data.val);
                 });
 
                 $scope.destroyPlot = function () {
-                    plot.destroy();
+                    $scope.plot.destroy();
                 }
             },
             controller: function ($scope) {
@@ -97040,12 +97032,14 @@ define('app/controls/plots/bigNumberChart/bigNumberChart',['require','d3','jquer
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('config.groupBy', function () {
+                $scope.$watch('model.data', function () {
                     $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
                 });
 
-                $scope.$watch('model.data', function () {
-                    $scope.updateData($scope.config.key, $scope.config.value, $scope.config.groupBy);
+                $scope.$watch('model.size', function(){
+                    setTimeout(function() {
+                        $scope.plot.updateSizes();
+                    }, 0);
                 });
 
                 $scope.$on('$destroy', function () {
