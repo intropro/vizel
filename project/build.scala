@@ -23,20 +23,19 @@ object build extends Build {
       "sonatype releases"  at "http://oss.sonatype.org/content/repositories/releases/",
       "sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       "typesafe repo"      at "http://repo.typesafe.com/typesafe/releases/",
-      "intropro releases"  at "http://build.ea.intropro.com:8081/nexus/content/repositories/releases-public/",
-      "intropro snapshots" at "http://build.ea.intropro.com:8081/nexus/content/repositories/snapshots-public/"
+      "intropro releases"  at "http://build.ea.intropro.com:8083/nexus/content/repositories/releases/",
+      "intropro snapshots" at "http://build.ea.intropro.com:8083/nexus/content/repositories/snapshots/"
     ),
 
 //    publishMavenStyle := true,
 
     publishTo := {
-	  val nexus = "http://build.ea.intropro.com:8081/nexus/"
+	  val nexus = "http://build.ea.intropro.com:8083/nexus/"
 	  if (isSnapshot.value)
-        Some("snapshots" at nexus + "content/repositories/snapshots-public") 
+        Some("snapshots" at nexus + "content/repositories/snapshots") 
 	  else
-	    Some("releases"  at nexus + "content/repositories/releases-public")
+	    Some("releases"  at nexus + "content/repositories/releases")
     },
-
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
   )
 
